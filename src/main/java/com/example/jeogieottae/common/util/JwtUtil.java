@@ -28,7 +28,7 @@ public class JwtUtil {
     private JwtParser parser;
 
     @PostConstruct
-    public void init(){
+    public void init() {
 
         byte[] bytes = Decoders.BASE64.decode(secretKeyString);
         this.key = Keys.hmacShaKeyFor(bytes);

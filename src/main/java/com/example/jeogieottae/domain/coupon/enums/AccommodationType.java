@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum AccommodationType {
 
     HOTEL("HOTEL"),
-    POOL_VILLA("POOL VILLA"),
+    POOL_VILLA("POOL_VILLA"),
     RESORT("RESORT"),
     MOTEL("MOTEL")
     ;

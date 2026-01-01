@@ -10,12 +10,9 @@ import com.example.jeogieottae.domain.auth.dto.response.SignInResponse;
 import com.example.jeogieottae.domain.auth.dto.response.SignUpResponse;
 import com.example.jeogieottae.domain.user.entity.User;
 import com.example.jeogieottae.domain.user.repository.UserRepository;
-import com.example.jeogieottae.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.example.jeogieottae.common.exception.ErrorCode.USER_ALREADY_EXISTS;
 
 @Service
 @RequiredArgsConstructor

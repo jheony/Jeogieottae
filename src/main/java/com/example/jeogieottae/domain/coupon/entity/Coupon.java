@@ -1,6 +1,7 @@
 package com.example.jeogieottae.domain.coupon.entity;
 
 import com.example.jeogieottae.domain.coupon.enums.AccommodationType;
+import com.example.jeogieottae.domain.coupon.enums.CouponType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,7 +23,8 @@ public class Coupon {
     private String name;
 
     @Column(length = 50, nullable = false)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private CouponType discountType;
 
     @Column(name = "discount_value", nullable = false)
     private Long discountValue;

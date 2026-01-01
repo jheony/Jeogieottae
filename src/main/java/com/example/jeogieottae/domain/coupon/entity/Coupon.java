@@ -1,6 +1,6 @@
 package com.example.jeogieottae.domain.coupon.entity;
 
-import com.example.jeogieottae.domain.coupon.enums.AccommodationType;
+import com.example.jeogieottae.domain.accommodation.enums.AccommodationType;
 import com.example.jeogieottae.domain.coupon.enums.CouponType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

@@ -28,7 +28,7 @@ public class JwtUtil {
     private JwtParser parser;
 
     @PostConstruct
-    public void init(){
+    public void init() {
 
         byte[] bytes = Decoders.BASE64.decode(secretKeyString);
         this.key = Keys.hmacShaKeyFor(bytes);
@@ -51,6 +51,7 @@ public class JwtUtil {
     }
 
     public boolean validateToken(String token) {
+
         if (token == null || token.isBlank()) return false;
 
         if (token.startsWith(BEARER_PREFIX)) {

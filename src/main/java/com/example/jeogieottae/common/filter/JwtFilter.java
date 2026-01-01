@@ -1,5 +1,6 @@
 package com.example.jeogieottae.common.filter;
 
+import com.example.jeogieottae.common.dto.AuthUser;
 import com.example.jeogieottae.common.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,9 +10,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -34,8 +33,8 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) throws ServletException, IOException
-    {
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+
         String authorizationHeader = request.getHeader("Authorization");
 
         if (authorizationHeader == null || authorizationHeader.isBlank()) {
@@ -58,18 +57,12 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         Long userId = jwtUtil.extractUserId(jwt);
-        String username = jwtUtil.extractUsername(jwt);
         String userEmail = jwtUtil.extractUserEmail(jwt);
+        String username = jwtUtil.extractUsername(jwt);
 
-        request.setAttribute("userId", userId);
-        request.setAttribute("username", username);
-        request.setAttribute("userEmail", userEmail);
+        AuthUser authUser = AuthUser.of(userId, userEmail, username);
 
-        // 인증된 사용자 정보 설정
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(userEmail));
-
-        User user = new User(username, "", authorities);
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()));
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(authUser, null, List.of()));
 
         filterChain.doFilter(request, response);
     }

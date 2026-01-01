@@ -1,11 +1,9 @@
 package com.example.jeogieottae.common.response;
 
 import com.example.jeogieottae.common.exception.ErrorCode;
-import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Getter
 public class GlobalResponse<T> {
     private boolean success;
     private String message;

@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Getter
 public class ReservationDto {
+
     private Long id;
     private LocalDateTime checkIn;
     private LocalDateTime checkOut;
@@ -22,6 +23,7 @@ public class ReservationDto {
     private Boolean isDeleted;
 
     public ReservationDto(Reservation reservation) {
+
         this.id = reservation.getId();
         this.checkIn = reservation.getCheckIn();
         this.checkOut = reservation.getCheckOut();

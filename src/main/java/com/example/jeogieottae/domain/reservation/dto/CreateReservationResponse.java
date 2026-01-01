@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Getter
 public class CreateReservationResponse {
+
     private final String userName;
     private final String accommodationName;
     private final LocalDateTime checkIn;

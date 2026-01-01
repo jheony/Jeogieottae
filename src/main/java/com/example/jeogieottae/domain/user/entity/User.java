@@ -26,4 +26,15 @@ public class User {
     @Column
     private boolean isDeleted = false;
 
+    private User(String email, String username, String password) {
+
+        this.email = email;
+        this.username = username;
+        this.password = password;
+    }
+
+    public static User create(String email, String username, String password) {
+
+        return new User(email, username, password);
+    }
 }

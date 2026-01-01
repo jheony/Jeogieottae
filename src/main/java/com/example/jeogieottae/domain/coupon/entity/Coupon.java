@@ -1,5 +1,6 @@
 package com.example.jeogieottae.domain.coupon.entity;
 
+import com.example.jeogieottae.domain.coupon.enums.AccommodationType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,6 +33,8 @@ public class Coupon {
     @Column(name = "condition_min_price")
     private Long conditionMinPrice;
 
+
     @Column(name = "condition_accommodation_type", length = 50)
-    private String conditionAccommodationType;
+    @Enumerated(EnumType.STRING)
+    private AccommodationType conditionAccommodationType;
 }

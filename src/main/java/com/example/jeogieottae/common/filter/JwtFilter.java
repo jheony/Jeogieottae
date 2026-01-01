@@ -60,7 +60,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String userEmail = jwtUtil.extractUserEmail(jwt);
         String username = jwtUtil.extractUsername(jwt);
 
-        AuthUser authUser = AuthUser.create(userId, userEmail, username);
+        AuthUser authUser = AuthUser.of(userId, userEmail, username);
 
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(authUser, null, List.of()));
 

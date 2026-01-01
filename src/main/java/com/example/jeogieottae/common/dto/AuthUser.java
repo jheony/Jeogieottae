@@ -11,7 +11,7 @@ public class AuthUser {
     private final String email;
     private final String username;
 
-    public static AuthUser create(Long userId, String email, String username) {
+    public static AuthUser of(Long userId, String email, String username) {
         return new AuthUser(userId, email, username);
     }
 }

@@ -23,6 +23,7 @@ public class AuthService {
 
     @Transactional
     public SignUpResponse signUp(SignUpRequest request) {
+
         String userEmail = request.getEmail();
         String username = request.getUsername();
 
@@ -30,7 +31,7 @@ public class AuthService {
             throw new CustomException(USER_ALREADY_EXISTS);
         }
 
-        User user = User.from(userEmail, username, passwordEncoder.encode(request.getPassword()));
+        User user = User.create(userEmail, username, passwordEncoder.encode(request.getPassword()));
 
         userRepository.save(user);
 

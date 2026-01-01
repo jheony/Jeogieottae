@@ -33,7 +33,7 @@ public class User {
         this.password = password;
     }
 
-    public static User from(String email, String username, String password) {
+    public static User create(String email, String username, String password) {
 
         return new User(email, username, password);
     }

@@ -1,10 +1,10 @@
 package com.example.jeogieottae.domain.reservation.controller;
 
+import com.example.jeogieottae.common.dto.AuthUser;
 import com.example.jeogieottae.common.response.GlobalResponse;
-import com.example.jeogieottae.domain.reservation.dto.CreateReseravtionRequest;
+import com.example.jeogieottae.domain.reservation.dto.CreateReservationRequest;
 import com.example.jeogieottae.domain.reservation.dto.CreateReservationResponse;
 import com.example.jeogieottae.domain.reservation.service.ReservationService;
-import com.example.jeogieottae.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,12 +19,12 @@ public class ReservationController {
 
     @PostMapping("/{roomId}/{couponId}")
     public ResponseEntity<GlobalResponse<CreateReservationResponse>> createReservation(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long roomId,
             @PathVariable Long couponId,
-            @ModelAttribute CreateReseravtionRequest request
+            @ModelAttribute CreateReservationRequest request
     ) {
-        CreateReservationResponse response = reservationService.createReservation(roomId, couponId, user, request);
+        CreateReservationResponse response = reservationService.createReservation(roomId, couponId, authUser.getUserId(), request);
         return ResponseEntity.ok(GlobalResponse.success(true, "숙소 예약 성공", response));
     }
 }

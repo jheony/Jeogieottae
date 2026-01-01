@@ -2,7 +2,7 @@ package com.example.jeogieottae.domain.reservation.service;
 
 import com.example.jeogieottae.common.exception.CustomException;
 import com.example.jeogieottae.common.exception.ErrorCode;
-import com.example.jeogieottae.domain.reservation.dto.CreateReseravtionRequest;
+import com.example.jeogieottae.domain.reservation.dto.CreateReservationRequest;
 import com.example.jeogieottae.domain.reservation.dto.CreateReservationResponse;
 import com.example.jeogieottae.domain.reservation.dto.ReservationDto;
 import com.example.jeogieottae.domain.reservation.entity.Reservation;
@@ -10,6 +10,7 @@ import com.example.jeogieottae.domain.reservation.repository.ReservationReposito
 import com.example.jeogieottae.domain.room.entity.Room;
 import com.example.jeogieottae.domain.room.repository.RoomRepository;
 import com.example.jeogieottae.domain.user.entity.User;
+import com.example.jeogieottae.domain.user.repository.UserRepository;
 import com.example.jeogieottae.domain.usercoupon.entity.UserCoupon;
 import com.example.jeogieottae.domain.usercoupon.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +24,14 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;
     private final UserCouponRepository userCouponRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public CreateReservationResponse createReservation(
             Long roomId,
             Long userCouponId,
-            User user,
-            CreateReseravtionRequest request
+            Long userId,
+            CreateReservationRequest request
     ) {
         UserCoupon userCoupon = userCouponRepository.findById(userCouponId).orElseThrow(
                 () -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
@@ -39,10 +41,8 @@ public class ReservationService {
         }
 
         Boolean ableToReservationFlag = reservationRepository.ableToReservation(
-                user.getId(),
+                userId,
                 roomId,
-                request.getGuest(),
-                userCouponId,
                 request.getCheckIn(),
                 request.getCheckOut()
         );
@@ -52,9 +52,15 @@ public class ReservationService {
         }
 
         Room room = roomRepository.getReferenceById(roomId);
-        ReservationDto dto = new ReservationDto(Reservation.create(user, room, userCouponId, request));
+        User user = userRepository.getReferenceById(userId);
+
         Long discountPrice = room.getPrice() * (100 - userCoupon.getCoupon().getDiscountValue()) / 100;
 
-        return new CreateReservationResponse(dto, user, discountPrice);
+        Reservation reservation = reservationRepository.save(Reservation.create(user, room, userCouponId, request));
+
+        ReservationDto dto = new ReservationDto(reservation);
+        String accommodationName = room.getAccommodation().getName();
+
+        return new CreateReservationResponse(dto, accommodationName, discountPrice);
     }
 }

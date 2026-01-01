@@ -21,22 +21,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                         SELECT 1
                         FROM Reservation r
                         WHERE r.room.id = :roomId
+                            AND r.isDeleted = FALSE
                             AND r.checkIn < :checkOut
                             AND r.checkOut > :checkIn
-                        )
-                    THEN FALSE
-                    WHEN NOT EXISTS(
-                        SELECT 1
-                        FROM UserCoupon c
-                        WHERE c.id = :couponId
-                            AND c.isUsed = TRUE
-                        )
-                    THEN FALSE
-                    WHEN EXISTS(
-                        SELECT 1
-                        FROM UserCoupon c
-                        WHERE c.id = :couponId
-                            AND c.isUsed = TRUE
                         )
                     THEN FALSE
                     ELSE TRUE
@@ -45,8 +32,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     Boolean ableToReservation(
             Long userId,
             Long roomId,
-            Long guest,
-            Long couponId,
             LocalDateTime checkIn,
             LocalDateTime checkOut
     );

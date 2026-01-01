@@ -1,6 +1,6 @@
 package com.example.jeogieottae.domain.reservation.entity;
 
-import com.example.jeogieottae.domain.reservation.dto.CreateReseravtionRequest;
+import com.example.jeogieottae.domain.reservation.dto.CreateReservationRequest;
 import com.example.jeogieottae.domain.reservation.enums.ReservationStatus;
 import com.example.jeogieottae.domain.room.entity.Room;
 import com.example.jeogieottae.domain.user.entity.User;
@@ -55,31 +55,19 @@ public class Reservation {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
 
-    public Reservation(LocalDateTime checkIn,
-                       LocalDateTime checkOut,
-                       User user, Room room,
-                       Long userCouponId,
-                       Long guest,
-                       ReservationStatus status
-    ) {
-        this.checkIn = checkIn;
-        this.checkOut = checkOut;
-        this.user = user;
-        this.room = room;
-        this.userCouponId = userCouponId;
-        this.guestCount = guest;
-        this.status = status;
-    }
+    public static Reservation create(User user, Room room, Long userCouponId, CreateReservationRequest request) {
 
-    public static Reservation create(User user, Room room, Long userCouponId, CreateReseravtionRequest request) {
-        return new Reservation(
-                request.getCheckIn(),
-                request.getCheckOut(),
-                user,
-                room,
-                userCouponId,
-                request.getGuest(),
-                request.getStatus()
-        );
+        Reservation reservation = new Reservation();
+
+        reservation.checkIn = request.getCheckIn();
+        reservation.checkOut = request.getCheckOut();
+        reservation.user = user;
+        reservation.room = room;
+        reservation.userCouponId = userCouponId;
+        reservation.guestCount = request.getGuest();
+        reservation.status = request.getStatus();
+        reservation.isDeleted = false;
+
+        return reservation;
     }
 }

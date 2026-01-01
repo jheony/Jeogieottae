@@ -1,7 +1,6 @@
 package com.example.jeogieottae.common.config;
 
 import com.example.jeogieottae.common.filter.JwtFilter;
-import com.example.jeogieottae.common.util.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,11 +19,6 @@ import org.springframework.security.web.servletapi.SecurityContextHolderAwareReq
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new PasswordEncoder();
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

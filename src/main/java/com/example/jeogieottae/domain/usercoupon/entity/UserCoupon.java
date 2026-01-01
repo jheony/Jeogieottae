@@ -27,4 +27,15 @@ public class UserCoupon {
 
     @Column(name = "is_used")
     private boolean isUsed;
+
+    public static UserCoupon create(User user, Coupon coupon) {
+
+        UserCoupon userCoupon = new UserCoupon();
+
+        userCoupon.user = user;
+        userCoupon.coupon = coupon;
+        userCoupon.isUsed = false;
+
+        return userCoupon;
+    }
 }

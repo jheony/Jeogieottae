@@ -61,6 +61,8 @@ public class ReservationService {
 
         Reservation reservation = reservationRepository.save(Reservation.create(user, room, couponName, originalPrice, discountPrice,request));
 
+        userCoupon.setUsed(true);
+
         ReservationDto dto = ReservationDto.from(reservation);
         String accommodationName = room.getAccommodation().getName();
 

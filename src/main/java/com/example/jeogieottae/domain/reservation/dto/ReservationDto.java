@@ -2,7 +2,7 @@ package com.example.jeogieottae.domain.reservation.dto;
 
 import com.example.jeogieottae.domain.reservation.entity.Reservation;
 import com.example.jeogieottae.domain.reservation.enums.ReservationStatus;
-import com.example.jeogieottae.domain.room.entity.Room;
+import com.example.jeogieottae.domain.room.dto.RoomDto;
 import com.example.jeogieottae.domain.user.dto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +17,7 @@ public class ReservationDto {
     private LocalDateTime checkIn;
     private LocalDateTime checkOut;
     private UserDto user;
-    private Room room;
+    private RoomDto room;
     private String couponName;
     private Long guestCount;
     private Long originalPrice;
@@ -33,7 +33,7 @@ public class ReservationDto {
                 reservation.getCheckIn(),
                 reservation.getCheckOut(),
                 UserDto.from(reservation.getUser()),
-                reservation.getRoom(),
+                RoomDto.from(reservation.getRoom()),
                 reservation.getCouponName(),
                 reservation.getGuestCount(),
                 reservation.getOriginalPrice(),

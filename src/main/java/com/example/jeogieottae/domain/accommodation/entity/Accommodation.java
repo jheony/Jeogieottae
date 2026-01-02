@@ -20,9 +20,12 @@ public class Accommodation {
     private String name;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private AccommodationType type;
 
     @Column(nullable = false)
     private String location;
 
+    @Column(nullable = false)
+    private double rating;
 }

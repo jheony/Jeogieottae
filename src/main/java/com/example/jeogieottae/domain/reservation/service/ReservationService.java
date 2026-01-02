@@ -7,6 +7,7 @@ import com.example.jeogieottae.domain.reservation.dto.CreateReservationResponse;
 import com.example.jeogieottae.domain.reservation.dto.ReservationDto;
 import com.example.jeogieottae.domain.reservation.entity.Reservation;
 import com.example.jeogieottae.domain.reservation.repository.ReservationRepository;
+import com.example.jeogieottae.domain.room.dto.RoomDto;
 import com.example.jeogieottae.domain.room.entity.Room;
 import com.example.jeogieottae.domain.room.repository.RoomRepository;
 import com.example.jeogieottae.domain.user.entity.User;
@@ -55,8 +56,10 @@ public class ReservationService {
         Room room = roomRepository.getReferenceById(roomId);
         User user = userRepository.getReferenceById(userId);
 
+        RoomDto roomDto = RoomDto.from(room);
+
         String couponName = userCoupon.getCoupon().getName();
-        Long originalPrice = room.getPrice();
+        Long originalPrice = roomDto.getPrice();
         Long discountPrice = originalPrice * (100 - userCoupon.getCoupon().getDiscountValue()) / 100;
 
         Reservation reservation = reservationRepository.save(Reservation.create(user, room, couponName, originalPrice, discountPrice,request));

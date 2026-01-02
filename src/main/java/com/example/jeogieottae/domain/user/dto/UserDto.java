@@ -7,10 +7,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class UserDto {
-    Long id;
-    String email;
-    String username;
-    boolean isDeleted;
+    private Long id;
+    private String email;
+    private String username;
+    private boolean isDeleted;
 
     public static UserDto from(User user) {
 

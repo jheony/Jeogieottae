@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Entity
@@ -25,6 +26,7 @@ public class UserCoupon {
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
 
+    @Setter
     @Column(name = "is_used")
     private boolean isUsed;
 

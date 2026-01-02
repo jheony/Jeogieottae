@@ -23,8 +23,8 @@ public class UserCouponResponse {
                 coupon.getName(),
                 coupon.getDiscountValue(),
                 coupon.getExpiresAt(),
-                coupon.getConditionMinPrice(),
-                coupon.getConditionAccommodationType()
+                coupon.getMinPrice(),
+                coupon.getAccommodationType()
         );
     }
 }

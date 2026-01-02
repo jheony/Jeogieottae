@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ReservationStatus {
+
     RESERVED("RESERVED"),
     VISITED("VISITED"),
     CANCEL("CANCEL")

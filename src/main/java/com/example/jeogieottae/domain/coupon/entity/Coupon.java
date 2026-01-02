@@ -32,11 +32,11 @@ public class Coupon {
     @Column(name = "expires_at")
     private LocalDateTime expiresAt;
 
-    @Column(name = "condition_min_price")
-    private Long conditionMinPrice;
+    @Column(name = "min_price")
+    private Long minPrice;
 
 
-    @Column(name = "condition_accommodation_type", length = 50)
+    @Column(name = "accommodation_type", length = 50)
     @Enumerated(EnumType.STRING)
-    private AccommodationType conditionAccommodationType;
+    private AccommodationType accommodationType;
 }

@@ -78,7 +78,7 @@ public class Reservation {
         reservation.guestCount = request.getGuest();
         reservation.originalPrice = originalPrice;
         reservation.discountedPrice = discountedPrice;
-        reservation.status = request.getStatus();
+        reservation.status = ReservationStatus.RESERVED;
         reservation.isDeleted = false;
 
         return reservation;

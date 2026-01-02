@@ -34,7 +34,7 @@ public class ReservationController {
     }
 
     @GetMapping
-    public ResponseEntity<CustomPageResponse<ReservationResponse>> getReservationList(
+    public ResponseEntity<CustomPageResponse<ReservationResponse>> getAllMyReservationList(
 
             @PageableDefault(
                     page = 0,

@@ -62,7 +62,7 @@ public class ReservationService {
         Long originalPrice = room.getPrice();
         Long discountPrice = originalPrice * (100 - userCoupon.getCoupon().getDiscountValue()) / 100;
 
-        Reservation reservation = reservationRepository.save(Reservation.create(user, room, couponName, originalPrice, discountPrice,request));
+        Reservation reservation = reservationRepository.save(Reservation.create(user, room, couponName, originalPrice, discountPrice, request));
 
         userCoupon.setUsed(true);
 
@@ -77,5 +77,21 @@ public class ReservationService {
 
         Page<ReservationResponse> response = reservationRepository.findAllById(userId, pageable);
         return CustomPageResponse.from(response);
+    }
+
+    @Transactional
+    public ReservationResponse deleteReservation(Long userId, Long reservationId) {
+
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(
+                () -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND)
+        );
+
+        if (!reservation.getUser().equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
+        reservation.setIsDeleted(true);
+
+        return ReservationResponse.from(ReservationDto.from(reservation));
     }
 }

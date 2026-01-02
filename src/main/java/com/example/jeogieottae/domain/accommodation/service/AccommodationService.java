@@ -31,8 +31,8 @@ public class AccommodationService {
     @Transactional(readOnly = true)
     public GetAccommodationResponse getAccommodation(Long accommodationId) {
 
-        Accommodation accommodation = accommodationRepository.findById(accommodationId)
-                .orElseThrow(() -> new CustomException(ErrorCode.ACCOMMODATION_NOT_FOUND));
+        Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(
+                () -> new CustomException(ErrorCode.ACCOMMODATION_NOT_FOUND));
 
         return GetAccommodationResponse.from(accommodation);
     }

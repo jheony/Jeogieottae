@@ -22,7 +22,7 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
-    @PostMapping("/roomId/{roomId}/couponId/{couponId}")
+    @PostMapping
     public ResponseEntity<GlobalResponse<CreateReservationResponse>> createReservation(
             @AuthenticationPrincipal AuthUser authUser,
             @ModelAttribute CreateReservationRequest request

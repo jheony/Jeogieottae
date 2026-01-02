@@ -13,6 +13,8 @@ public enum ErrorCode {
     USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
     COUPON_NOT_FOUND(404, "쿠폰을 찾을 수 없습니다."),
     RESERVATION_NOT_FOUND(404, "예약을 찾을 수 없습니다."),
+    ACCOMMODATION_NOT_FOUND(404, "숙소를 찾을 수 없습니다."),
+
     //------403-----------------------
     USER_NOT_MATCH(403, "접근 권한이 없습니다"),
     PASSWORD_NOT_MATCH(403, "비밀번호가 일치하지 않습니다."),

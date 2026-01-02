@@ -2,6 +2,7 @@ package com.example.jeogieottae.domain.accommodation.dto.response;
 
 import com.example.jeogieottae.domain.accommodation.entity.Accommodation;
 import com.example.jeogieottae.domain.accommodation.enums.AccommodationType;
+import com.example.jeogieottae.domain.accommodation.enums.City;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,7 +12,7 @@ public class AccommodationDto {
     private Long id;
     private String name;
     private AccommodationType type;
-    private String location;
+    private City location;
     private double rating;
 
     public static AccommodationDto from(Accommodation accommodation) {

@@ -24,11 +24,11 @@ public class UserCouponService {
     @Transactional
     public UserCouponResponse issueCoupon(Long userId, Long couponId) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
+        Coupon coupon = couponRepository.findById(couponId).orElseThrow(
+                () -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
 
         if(userCouponRepository.existsByUserIdAndCouponId(userId, couponId)){
             throw new CustomException(ErrorCode.COUPON_ALREADY_ISSUED);

@@ -1,4 +1,10 @@
-source .env
+#!/usr/bin/env bash
+set -e
+
+BASE_DIR=$(cd "$(dirname "$0")" && pwd)
+ROOT_DIR=$(cd "$BASE_DIR/.." && pwd)
+
+source "$ROOT_DIR/.env"
 
 cd csv/generator
 javac AccommodationCsvGenerator.java

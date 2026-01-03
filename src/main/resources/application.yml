@@ -1,6 +1,6 @@
 spring:
   application:
-    name: Jeogieottae
+    name: jeogieottae
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DATA_SOURCE_URL}
@@ -18,4 +18,4 @@ spring:
 
 jwt:
   secret:
-      key: ${JWT_SECRET_KEY}
+    key: ${JWT_SECRET_KEY}

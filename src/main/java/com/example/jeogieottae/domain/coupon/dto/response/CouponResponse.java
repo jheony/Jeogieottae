@@ -2,6 +2,7 @@ package com.example.jeogieottae.domain.coupon.dto.response;
 
 import com.example.jeogieottae.domain.accommodation.enums.AccommodationType;
 import com.example.jeogieottae.domain.coupon.entity.Coupon;
+import com.example.jeogieottae.domain.coupon.enums.CouponType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -13,6 +14,7 @@ public class CouponResponse {
 
     private final Long id;
     private final String name;
+    private final CouponType discountType;
     private final Long discountValue;
     private final LocalDateTime expiresAt;
     private final Long conditionMinPrice;
@@ -22,6 +24,7 @@ public class CouponResponse {
         return new CouponResponse(
                 coupon.getId(),
                 coupon.getName(),
+                coupon.getDiscountType(),
                 coupon.getDiscountValue(),
                 coupon.getExpiresAt(),
                 coupon.getMinPrice(),

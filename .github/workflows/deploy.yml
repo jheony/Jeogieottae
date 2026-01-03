@@ -1,0 +1,58 @@
+name: CI/CD Spring Boot App
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build JAR
+        run: ./gradlew clean build
+
+      - name: Build Docker Image
+        run: docker build -t myrepo/myapp:latest .
+
+      - name: Docker Login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Docker Image
+        run: docker push myrepo/myapp:latest
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "Pull latest Docker image"
+            docker pull myrepo/myapp:latest
+            
+            echo "Stop and remove old container"
+            docker stop myapp || true
+            docker rm myapp || true
+            
+            echo "Run new container"
+            docker run -d --name myapp -p 8080:8080 \
+              -e SPRING_DATASOURCE_URL=jdbc:mysql://EC2_DB_PRIVATE_IP:3306/sparta \
+              -e SPRING_DATASOURCE_USERNAME=root \
+              -e SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD} \
+              -e SPRING_REDIS_HOST=EC2_REDIS_PRIVATE_IP \
+              -e SPRING_REDIS_PORT=6379 \
+              myrepo/myapp:latest

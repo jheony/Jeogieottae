@@ -25,7 +25,7 @@ public class CouponEventService {
     @Transactional
     public UserCouponResponse issueCouponEvent(Long userId, Long couponEventId) {
 
-        CouponEvent event = couponEventRepository.findById(couponEventId)
+        CouponEvent event = couponEventRepository.findByIdForUpdate(couponEventId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
 
         event.validateIssuable();

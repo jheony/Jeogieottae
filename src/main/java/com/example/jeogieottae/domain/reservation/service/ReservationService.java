@@ -3,9 +3,10 @@ package com.example.jeogieottae.domain.reservation.service;
 import com.example.jeogieottae.common.exception.CustomException;
 import com.example.jeogieottae.common.exception.ErrorCode;
 import com.example.jeogieottae.common.response.CustomPageResponse;
+import com.example.jeogieottae.domain.coupon.entity.Coupon;
+import com.example.jeogieottae.domain.coupon.enums.CouponType;
 import com.example.jeogieottae.domain.reservation.dto.CreateReservationRequest;
 import com.example.jeogieottae.domain.reservation.dto.CreateReservationResponse;
-import com.example.jeogieottae.domain.reservation.dto.ReservationDto;
 import com.example.jeogieottae.domain.reservation.dto.ReservationResponse;
 import com.example.jeogieottae.domain.reservation.entity.Reservation;
 import com.example.jeogieottae.domain.reservation.repository.ReservationRepository;
@@ -35,12 +36,6 @@ public class ReservationService {
             Long userId,
             CreateReservationRequest request
     ) {
-        UserCoupon userCoupon = userCouponRepository.findById(request.getUserCouponId()).orElseThrow(
-                () -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
-
-        if (userCoupon.isUsed()) {
-            throw new CustomException(ErrorCode.COUPON_ALREADY_ISSUED);
-        }
 
         Boolean ableToReservationFlag = reservationRepository.ableToReservation(
                 userId,
@@ -53,21 +48,47 @@ public class ReservationService {
             throw new CustomException(ErrorCode.RESERVATION_NOT_AVAILABLE);
         }
 
+        UserCoupon userCoupon = null;
+
+        if (request.getUserCouponId() != null) {
+            userCoupon = userCouponRepository.findById(request.getUserCouponId()).orElseThrow(
+                    () -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
+
+            if (userCoupon.isUsed()) {
+                throw new CustomException(ErrorCode.COUPON_ALREADY_ISSUED);
+            }
+        }
+
         Room room = roomRepository.getReferenceById(request.getRoomId());
         User user = userRepository.getReferenceById(userId);
 
-        String couponName = userCoupon.getCoupon().getName();
         Long originalPrice = room.getPrice();
+        Long specialPrice = room.getSpecialPrice() == null
+                            ? originalPrice
+                            : (originalPrice * (100 - room.getSpecialPrice().getDiscount()) / 100);
+
+        if (userCoupon == null) {
+            Reservation reservation = reservationRepository.save(
+                    Reservation.create(user, room, null, originalPrice, specialPrice, request));
+
+            return CreateReservationResponse.from(reservation);
+        }
+
         Long discountPrice = originalPrice * (100 - userCoupon.getCoupon().getDiscountValue()) / 100;
 
-        Reservation reservation = reservationRepository.save(Reservation.create(user, room, couponName, originalPrice, discountPrice, request));
+        Coupon coupon = userCoupon.getCoupon();
+
+        if (specialPrice >= coupon.getMinPrice()) {
+            discountPrice = coupon.getDiscountType().equals(CouponType.RATE)
+                            ? (specialPrice * (100 - coupon.getDiscountValue()) / 100)
+                            : specialPrice - coupon.getDiscountValue();
+        }
+        Reservation reservation = reservationRepository.save(
+                Reservation.create(user, room, coupon.getName(), originalPrice, discountPrice, request));
 
         userCoupon.setUsed(true);
 
-        ReservationDto dto = ReservationDto.from(reservation);
-        String accommodationName = room.getAccommodation().getName();
-
-        return CreateReservationResponse.from(dto, accommodationName);
+        return CreateReservationResponse.from(reservation);
     }
 
     @Transactional(readOnly = true)
@@ -88,12 +109,12 @@ public class ReservationService {
             throw new CustomException(ErrorCode.RESERVATION_NOT_FOUND);
         }
 
-        if (!reservation.getUser().equals(userId)) {
+        if (!reservation.getUser().getId().equals(userId)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
         reservation.setIsDeleted(true);
 
-        return ReservationResponse.from(ReservationDto.from(reservation));
+        return ReservationResponse.from(reservation);
     }
 }

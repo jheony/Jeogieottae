@@ -30,7 +30,8 @@ public enum ErrorCode {
     INVALID_PASSWORD(400, "비밀번호가 유효하지 않습니다."),
     VALIDATION_ERROR(400, "입력값이 유효하지 않습니다."),
     COUPON_ALREADY_ISSUED(400, "이미 발급받은 쿠폰입니다."),
-    COUPON_EVENT_NOT_AVAILABLE(400, "이용할 수 없는 쿠폰입니다.")
+    COUPON_EVENT_NOT_AVAILABLE(400, "이용할 수 없는 쿠폰입니다."),
+    ALL_COUPON_ALREADY_ISSUED(400, "쿠폰이 모두 소진되었습니다.")
     ;
     private final int status;
     private final String message;

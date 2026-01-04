@@ -50,15 +50,22 @@ public class CouponEvent {
         event.startAt = startAt;
         event.endAt = endAt;
         event.totalQuantity = totalQuantity;
-        event.availableQuantity = 0L;
+        event.availableQuantity = totalQuantity;
         event.status = CouponEventStatus.UPCOMING;
         return event;
     }
 
-    public void issue() {
-        if (availableQuantity <= 0) {
+    public void validateIssuable() {
+        if (status != CouponEventStatus.ONGOING) {
             throw new CustomException(ErrorCode.COUPON_EVENT_NOT_AVAILABLE);
         }
-        this.availableQuantity--;
+
+        if (availableQuantity <= 0) {
+            throw new CustomException(ErrorCode.ALL_COUPON_ALREADY_ISSUED);
+        }
+    }
+
+    public void decreaseQuantity() {
+        this.availableQuantity --;
     }
 }

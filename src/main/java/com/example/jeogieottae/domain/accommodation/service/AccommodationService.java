@@ -61,20 +61,20 @@ public class AccommodationService {
 
             redisTemplate.opsForValue().set(key, response);
             redisTemplate.expire(key, 1, TimeUnit.HOURS);
+
+            String currentKey = "current_accommodation_views";
+            redisTemplate.opsForZSet().incrementScore(currentKey, accommodationId, 1);
+            redisTemplate.expire(currentKey, 1, TimeUnit.HOURS);
+
+            String dailyKey = "daily_accommodation_views: " + LocalDate.now();
+            redisTemplate.opsForZSet().incrementScore(dailyKey, accommodationId, 1);
+            redisTemplate.expire(dailyKey, 1, TimeUnit.DAYS);
         }
-
-        String dailyKey = "daily_accommodation_views: " + LocalDate.now();
-        redisTemplate.opsForZSet().incrementScore(dailyKey, accommodationId, 1);
-        redisTemplate.expire(dailyKey, 1, TimeUnit.DAYS);
-
-        String currentKey = "current_accommodation_views";
-        redisTemplate.opsForZSet().incrementScore(currentKey, accommodationId, 1);
-        redisTemplate.expire(dailyKey, 1, TimeUnit.HOURS);
 
         return response;
     }
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0/5 * * * *")
     public void syncViewCountsToDatabase() {
 
         String accommodationKey = "current_accommodation_views";

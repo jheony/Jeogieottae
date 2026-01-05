@@ -26,7 +26,7 @@ import static com.example.jeogieottae.domain.room.entity.QRoom.room;
 
 @Repository
 @RequiredArgsConstructor
-public class AccommodationRepositoryImpl implements AccommodationRepositoryCustom {
+public class QAccommodationRepositoryImpl implements QAccommodationRepository {
 
     private final JPAQueryFactory queryFactory;
 

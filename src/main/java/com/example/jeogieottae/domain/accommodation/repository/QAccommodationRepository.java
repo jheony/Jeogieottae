@@ -5,7 +5,7 @@ import com.example.jeogieottae.domain.accommodation.dto.response.AccommodationRe
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface AccommodationRepositoryCustom {
+public interface QAccommodationRepository {
 
     Page<AccommodationResponse> searchAccommodations(SearchAccommodationCond cond, Pageable pageable);
 }

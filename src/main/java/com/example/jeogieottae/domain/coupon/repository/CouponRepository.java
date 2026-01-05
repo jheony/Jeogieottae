@@ -13,8 +13,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
-    @Query("SELECT c FROM Coupon c WHERE (:accommodation IS NULL OR c.accommodationType = :accommodation) " +
-            "AND (:discount IS NULL OR c.discountType = :discount)" +
-            "AND (:minPrice IS NULL OR c.minPrice >= :minPrice)")
-    Page<Coupon> findCouponList(Pageable pageable, @Param("accommodation") AccommodationType accommodation, @Param("discount") CouponType discount, @Param("minPrice") Long minPrice);
+    @Query("SELECT c FROM Coupon c WHERE (c.accommodationType = :accommodation) " +
+            "AND (c.discountType = :discount) " +
+            "AND (c.minPrice >= :minPrice)")
+    Page<Coupon> findCouponList(
+            Pageable pageable,
+            @Param("accommodation") AccommodationType accommodation,
+            @Param("discount") CouponType discount,
+            @Param("minPrice") Long minPrice);
 }

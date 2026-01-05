@@ -22,6 +22,9 @@ public class Room {
     @Column(nullable = false)
     private Long price;
 
+    @Column(name = "max_guest", nullable = false)
+    private Integer maxGuest = 2;
+
     @ManyToOne(fetch = FetchType.LAZY, optional=false)
     @JoinColumn(name="accommodation_id")
     private Accommodation accommodation;

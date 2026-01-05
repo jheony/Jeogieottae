@@ -14,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class AccommodationService {
@@ -22,6 +24,13 @@ public class AccommodationService {
 
     @Transactional(readOnly = true)
     public CustomPageResponse<AccommodationResponse> searchAccommodations(SearchAccommodationCond cond, Pageable pageable) {
+
+        if (cond.getStartDate() == null) {
+            cond.setStartDate(LocalDateTime.now());
+        }
+        if (cond.getEndDate() == null) {
+            cond.setEndDate(cond.getStartDate().plusDays(1));
+        }
 
         Page<AccommodationResponse> page = accommodationRepository.searchAccommodations(cond, pageable);
         return CustomPageResponse.from(page);

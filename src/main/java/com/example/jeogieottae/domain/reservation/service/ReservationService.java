@@ -22,6 +22,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
@@ -37,14 +39,14 @@ public class ReservationService {
             CreateReservationRequest request
     ) {
 
-        Boolean ableToReservationFlag = reservationRepository.ableToReservation(
+        List<Reservation> overlapReservationList = reservationRepository.findAllOverlapReservation(
                 userId,
                 request.getRoomId(),
                 request.getCheckIn(),
                 request.getCheckOut()
         );
 
-        if (!ableToReservationFlag) {
+        if (!overlapReservationList.isEmpty()) {
             throw new CustomException(ErrorCode.RESERVATION_NOT_AVAILABLE);
         }
 
@@ -53,6 +55,10 @@ public class ReservationService {
         if (request.getUserCouponId() != null) {
             userCoupon = userCouponRepository.findById(request.getUserCouponId()).orElseThrow(
                     () -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
+
+            if (userCoupon.getUser().getId().equals(userId)) {
+                throw new CustomException(ErrorCode.COUPON_NOT_FOUND);
+            }
 
             if (userCoupon.isUsed()) {
                 throw new CustomException(ErrorCode.COUPON_ALREADY_ISSUED);

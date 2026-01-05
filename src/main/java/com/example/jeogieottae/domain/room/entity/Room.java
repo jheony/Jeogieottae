@@ -30,4 +30,11 @@ public class Room {
     @JoinColumn(name = "special_price_id")
     private SpecialPrice specialPrice;
 
+    public Room(String name, Long price, Accommodation accommodation, SpecialPrice specialPrice) {
+
+        this.name = name;
+        this.price = price;
+        this.accommodation = accommodation;
+        this.specialPrice = specialPrice;
+    }
 }

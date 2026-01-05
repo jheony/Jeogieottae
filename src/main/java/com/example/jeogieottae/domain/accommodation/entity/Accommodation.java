@@ -33,4 +33,13 @@ public class Accommodation {
 
     @Column(name = "view_count")
     private Long viewCount;
+
+    public Accommodation(String name, AccommodationType type, City location) {
+
+        this.name = name;
+        this.type = type;
+        this.location = location;
+        this.rating = 0;
+        this.viewCount = 0L;
+    }
 }

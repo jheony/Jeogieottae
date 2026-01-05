@@ -60,11 +60,44 @@ public class AccommodationService {
             redisTemplate.expire(key, 1, TimeUnit.HOURS);
         }
 
-        String accommodationKey = "accommodation_views: " + LocalDate.now();
-        redisTemplate.opsForZSet().incrementScore(accommodationKey, accommodationId, 1);
-        redisTemplate.expire(accommodationKey, 1, TimeUnit.DAYS);
+        String dailyKey = "daily_accommodation_views: " + LocalDate.now();
+        redisTemplate.opsForZSet().incrementScore(dailyKey, accommodationId, 1);
+        redisTemplate.expire(dailyKey, 1, TimeUnit.DAYS);
+
+        String currentKey = "current_accommodation_views";
+        redisTemplate.opsForZSet().incrementScore(currentKey, accommodationId, 1);
+        redisTemplate.expire(dailyKey, 1, TimeUnit.DAYS);
 
         return response;
+    }
+
+    @Scheduled(cron = "0 * * * * *")
+    public void syncViewCountsToDatabase() {
+
+        String accommodationKey = "current_accommodation_views";
+
+        Set<Long> accommodationIds = redisTemplate.opsForZSet().range(accommodationKey, 0, -1)
+                .stream()
+                .map(id -> Long.parseLong(id.toString()))
+                .collect(Collectors.toSet());
+
+        if (accommodationIds.isEmpty()) {
+            return;
+        }
+
+        for (Long accommodationId : accommodationIds) {
+            Double score = redisTemplate.opsForZSet().score(accommodationKey, accommodationId);
+
+            if (score != null && score > 0) {
+
+                Accommodation accommodation = accommodationRepository.findById(accommodationId).orElse(null);
+                if (accommodation != null) {
+                    accommodation.setViewCount(accommodation.getViewCount() + score.intValue());
+                    accommodationRepository.save(accommodation);
+                }
+            }
+            redisTemplate.opsForZSet().remove(accommodationKey, accommodationId);
+        }
     }
 
 }

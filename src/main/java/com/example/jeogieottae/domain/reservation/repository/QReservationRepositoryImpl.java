@@ -56,6 +56,7 @@ public class QReservationRepositoryImpl implements QReservationRepository{
 
     @Override
     public UserCoupon findVaildUserCoupon(Long userId, Long userCouponId) {
+
         if (userCouponId == null) {
             return null;
         }
@@ -79,6 +80,7 @@ public class QReservationRepositoryImpl implements QReservationRepository{
 
     @Override
     public Page<ReservationResponse> findAllById(Long userId, Pageable pageable) {
+
         List<ReservationResponse> result = queryFactory
                 .select(Projections.constructor(ReservationResponse.class,
                         user.username,
@@ -106,6 +108,7 @@ public class QReservationRepositoryImpl implements QReservationRepository{
 
     @Override
     public Reservation findByIdWithUserAndAccommodation(Long reservationId) {
+
         return queryFactory
                 .selectFrom(reservation)
                 .join(reservation.user, user).fetchJoin()
@@ -115,6 +118,4 @@ public class QReservationRepositoryImpl implements QReservationRepository{
                 .fetchOne();
 
     }
-
-
 }

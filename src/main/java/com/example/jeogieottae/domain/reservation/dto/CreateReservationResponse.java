@@ -17,11 +17,11 @@ public class CreateReservationResponse {
     private final Long guest;
     private final Long discountPrice;
 
-    public static CreateReservationResponse from(Reservation reservation) {
+    public static CreateReservationResponse from(Reservation reservation, ReservationInfoDto dto) {
 
         return new CreateReservationResponse(
-                reservation.getUser().getUsername(),
-                reservation.getRoom().getAccommodation().getName(),
+                dto.getUsername(),
+                dto.getAccommodationName(),
                 reservation.getCheckIn(),
                 reservation.getCheckOut(),
                 reservation.getGuestCount(),

@@ -7,31 +7,37 @@ import com.example.jeogieottae.domain.coupon.entity.Coupon;
 import com.example.jeogieottae.domain.coupon.enums.CouponType;
 import com.example.jeogieottae.domain.reservation.dto.CreateReservationRequest;
 import com.example.jeogieottae.domain.reservation.dto.CreateReservationResponse;
+import com.example.jeogieottae.domain.reservation.dto.ReservationInfoDto;
 import com.example.jeogieottae.domain.reservation.dto.ReservationResponse;
 import com.example.jeogieottae.domain.reservation.entity.Reservation;
 import com.example.jeogieottae.domain.reservation.repository.ReservationRepository;
 import com.example.jeogieottae.domain.room.entity.Room;
-import com.example.jeogieottae.domain.room.repository.RoomRepository;
 import com.example.jeogieottae.domain.user.entity.User;
 import com.example.jeogieottae.domain.user.repository.UserRepository;
 import com.example.jeogieottae.domain.usercoupon.entity.UserCoupon;
-import com.example.jeogieottae.domain.usercoupon.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
-    private final RoomRepository roomRepository;
-    private final UserCouponRepository userCouponRepository;
     private final UserRepository userRepository;
+
+    private static Long getDiscountPrice(Long specialPrice, Coupon coupon) {
+        Long discountPrice = specialPrice * (100 - coupon.getDiscountValue()) / 100;
+
+        if (specialPrice >= coupon.getMinPrice()) {
+            discountPrice = coupon.getDiscountType().equals(CouponType.RATE)
+                    ? (specialPrice * (100 - coupon.getDiscountValue()) / 100)
+                    : specialPrice - coupon.getDiscountValue();
+        }
+        return discountPrice;
+    }
 
     @Transactional
     public CreateReservationResponse createReservation(
@@ -39,62 +45,38 @@ public class ReservationService {
             CreateReservationRequest request
     ) {
 
-        List<Reservation> overlapReservationList = reservationRepository.findAllOverlapReservation(
+        ReservationInfoDto userRoom = reservationRepository.findRoomAndUserNameWithOverlap(
                 userId,
                 request.getRoomId(),
                 request.getCheckIn(),
                 request.getCheckOut()
         );
 
-        if (!overlapReservationList.isEmpty()) {
+        if (userRoom.getOverlapReservationId() != null) {
             throw new CustomException(ErrorCode.RESERVATION_NOT_AVAILABLE);
         }
 
-        UserCoupon userCoupon = null;
+        UserCoupon userCoupon = reservationRepository.findVaildUserCoupon(userId, request.getUserCouponId());
 
-        if (request.getUserCouponId() != null) {
-            userCoupon = userCouponRepository.findById(request.getUserCouponId()).orElseThrow(
-                    () -> new CustomException(ErrorCode.COUPON_NOT_FOUND));
-
-            if (userCoupon.getUser().getId().equals(userId)) {
-                throw new CustomException(ErrorCode.COUPON_NOT_FOUND);
-            }
-
-            if (userCoupon.isUsed()) {
-                throw new CustomException(ErrorCode.COUPON_ALREADY_ISSUED);
-            }
-        }
-
-        Room room = roomRepository.getReferenceById(request.getRoomId());
+        Room room = userRoom.getRoom();
         User user = userRepository.getReferenceById(userId);
 
         Long originalPrice = room.getPrice();
         Long specialPrice = room.getSpecialPrice() == null
-                            ? originalPrice
-                            : (originalPrice * (100 - room.getSpecialPrice().getDiscount()) / 100);
-
-        if (userCoupon == null) {
-            Reservation reservation = reservationRepository.save(
-                    Reservation.create(user, room, null, originalPrice, specialPrice, request));
-
-            return CreateReservationResponse.from(reservation);
-        }
-
-        Long discountPrice = originalPrice * (100 - userCoupon.getCoupon().getDiscountValue()) / 100;
+                ? originalPrice
+                : (originalPrice * (100 - userRoom.getSpecialPriceDiscount()) / 100);
 
         Coupon coupon = userCoupon.getCoupon();
+        String couponName = coupon != null ? coupon.getName() : null;
 
-        if (specialPrice >= coupon.getMinPrice()) {
-            discountPrice = coupon.getDiscountType().equals(CouponType.RATE)
-                            ? (specialPrice * (100 - coupon.getDiscountValue()) / 100)
-                            : specialPrice - coupon.getDiscountValue();
-        }
+        Long discountPrice = getDiscountPrice(specialPrice, coupon);
+
         Reservation reservation = reservationRepository.save(
-                Reservation.create(user, room, coupon.getName(), originalPrice, discountPrice, request));
+                Reservation.create(user, room, couponName, originalPrice, discountPrice, request));
 
         userCoupon.setUsed(true);
 
-        return CreateReservationResponse.from(reservation);
+        return CreateReservationResponse.from(reservation, userRoom);
     }
 
     @Transactional(readOnly = true)

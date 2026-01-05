@@ -3,6 +3,7 @@ package com.example.jeogieottae.domain.accommodation.service;
 import com.example.jeogieottae.common.exception.CustomException;
 import com.example.jeogieottae.common.exception.ErrorCode;
 import com.example.jeogieottae.common.response.CustomPageResponse;
+import com.example.jeogieottae.domain.accommodation.dto.condition.SearchAccommodationCond;
 import com.example.jeogieottae.domain.accommodation.dto.response.AccommodationResponse;
 import com.example.jeogieottae.domain.accommodation.dto.response.GetAccommodationResponse;
 import com.example.jeogieottae.domain.accommodation.entity.Accommodation;
@@ -20,12 +21,10 @@ public class AccommodationService {
     private final AccommodationRepository accommodationRepository;
 
     @Transactional(readOnly = true)
-    public CustomPageResponse<AccommodationResponse> getAccommodationList(Pageable pageable) {
+    public CustomPageResponse<AccommodationResponse> searchAccommodations(SearchAccommodationCond cond, Pageable pageable) {
 
-        Page<Accommodation> accommodationPage = accommodationRepository.findAll(pageable);
-        Page<AccommodationResponse> accommodationResponsePage = accommodationPage
-                .map(AccommodationResponse::from);
-        return CustomPageResponse.from(accommodationResponsePage);
+        Page<AccommodationResponse> page = accommodationRepository.searchAccommodations(cond, pageable);
+        return CustomPageResponse.from(page);
     }
 
     @Transactional(readOnly = true)

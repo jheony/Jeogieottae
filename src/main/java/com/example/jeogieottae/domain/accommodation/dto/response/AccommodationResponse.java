@@ -9,17 +9,17 @@ import lombok.RequiredArgsConstructor;
 public class AccommodationResponse {
 
     private final String name;
-    private final int pricePerNight;
+    private final Long pricePerNight;
     private final double rating;
-    private final int availableRooms;
+    private final Long availableRooms;
 
-    public static AccommodationResponse from(Accommodation accommodation) {
+    public static AccommodationResponse from(Accommodation accommodation, Long pricePerNight, Long availableRooms) {
 
         return new AccommodationResponse(
                 accommodation.getName(),
-                0,
+                pricePerNight,
                 accommodation.getRating(),
-                0
+                availableRooms
         );
     }
 }

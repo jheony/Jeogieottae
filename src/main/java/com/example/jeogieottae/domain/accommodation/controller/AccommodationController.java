@@ -4,7 +4,7 @@ import com.example.jeogieottae.common.response.CustomPageResponse;
 import com.example.jeogieottae.common.response.GlobalResponse;
 import com.example.jeogieottae.domain.accommodation.dto.condition.SearchAccommodationCond;
 import com.example.jeogieottae.domain.accommodation.dto.response.AccommodationResponse;
-import com.example.jeogieottae.domain.accommodation.dto.response.GetAccommodationResponse;
+import com.example.jeogieottae.domain.accommodation.dto.response.GetAccommodationCacheResponse;
 import com.example.jeogieottae.domain.accommodation.service.AccommodationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -32,9 +32,9 @@ public class AccommodationController {
     }
 
     @GetMapping("/{accommodationId}")
-    public ResponseEntity<GlobalResponse<GetAccommodationResponse>> getAccommodation(@PathVariable Long accommodationId) {
+    public ResponseEntity<GlobalResponse<GetAccommodationCacheResponse>> getAccommodation(@PathVariable Long accommodationId) {
 
-        GetAccommodationResponse response = accommodationService.getAccommodation(accommodationId);
+        GetAccommodationCacheResponse response = accommodationService.getAccommodation(accommodationId);
 
         return ResponseEntity.ok(GlobalResponse.success(true, "숙소 상세 조회 성공", response));
     }

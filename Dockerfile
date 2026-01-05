@@ -2,14 +2,7 @@ FROM gradle:8.14.3-jdk17 AS build
 
 WORKDIR /app
 
-RUN mkdir -p /tmp/.gradle-cache
-
-COPY build.gradle settings.gradle ./
-COPY gradle ./gradle
-
-RUN gradle --no-daemon build -x test --refresh-dependencies
-
-COPY src ./src
+COPY . .
 
 RUN gradle --no-daemon bootJar -x test
 

@@ -8,6 +8,7 @@ public enum ErrorCode {
     USER_ALREADY_EXISTS(409, "이미 존재하는 사용자 이메일입니다."),
     COUPON_ALREADY_USED(409, "이미 사용한 쿠폰입니다."),
     RESERVATION_NOT_AVAILABLE(409, "예약일자가 기존 예약과 중복됩니다."),
+    COUPON_EVENT_CONFLICT(409,"현재 쿠폰 발급 처리중입니다. 잠시 후 다시 시도해 주세요."),
 
     //------404-----------------------
     USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
@@ -29,7 +30,9 @@ public enum ErrorCode {
     INVALID_PASSWORD_FORMAT(400, "비밀번호 형식이 올바르지 않습니다."),
     INVALID_PASSWORD(400, "비밀번호가 유효하지 않습니다."),
     VALIDATION_ERROR(400, "입력값이 유효하지 않습니다."),
-    COUPON_ALREADY_ISSUED(400, "이미 발급받은 쿠폰입니다.")
+    COUPON_ALREADY_ISSUED(400, "이미 발급받은 쿠폰입니다."),
+    COUPON_EVENT_NOT_AVAILABLE(400, "이용할 수 없는 쿠폰입니다."),
+    ALL_COUPON_ALREADY_ISSUED(400, "쿠폰이 모두 소진되었습니다.")
     ;
     private final int status;
     private final String message;

@@ -41,7 +41,7 @@ public class AccommodationRepositoryImpl implements AccommodationRepositoryCusto
                         room.count()
                 ))
                 .from(accommodation)
-                .leftJoin(room).on(room.accommodation.eq(accommodation))
+                .join(room).on(room.accommodation.eq(accommodation))
                 .where(
                         containsKeyword(cond.getKeyword()),
                         eqLocation(cond.getLocate()),

@@ -1,12 +1,13 @@
 package com.example.jeogieottae.common.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class QuerydlsConfig {
+public class QuerydslConfig {
 
     @PersistenceContext
     private EntityManager em;

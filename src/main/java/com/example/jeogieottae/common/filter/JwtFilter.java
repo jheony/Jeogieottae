@@ -6,7 +6,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,32 +26,31 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String uri = request.getRequestURI();
-        return uri.equals("/auth/signup") || uri.equals("/auth/signin");
+        return uri.equals("/auth/signup") || uri.equals("/auth/signin")|| uri.equals("/coupons")|| uri.equals("/accommodations");
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
 
         String authorizationHeader = request.getHeader("Authorization");
 
         if (authorizationHeader == null || authorizationHeader.isBlank()) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT가 필요합니다.");
+            filterChain.doFilter(request, response);
             return;
         }
 
         if (!authorizationHeader.startsWith("Bearer ")) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "JWT가 존재하지 않습니다.");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰 헤더");
             return;
         }
 
         String jwt = authorizationHeader.substring(7);
 
         if (!jwtUtil.validateToken(jwt)) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"error\": \"Unauthorized\"}");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰");
             return;
         }
 
@@ -62,8 +60,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
         AuthUser authUser = AuthUser.of(userId, userEmail, username);
 
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(authUser, null, List.of()));
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(authUser, null, List.of())
+        );
 
         filterChain.doFilter(request, response);
     }
+
 }

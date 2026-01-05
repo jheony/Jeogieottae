@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Entity
@@ -31,6 +32,7 @@ public class Accommodation {
     @Column(nullable = false)
     private double rating;
 
+    @Setter
     @Column(name = "view_count")
     private Long viewCount;
 

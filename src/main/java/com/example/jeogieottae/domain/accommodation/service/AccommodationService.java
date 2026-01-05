@@ -104,7 +104,7 @@ public class AccommodationService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetAccommodationCacheResponse> GetAccommodationCacheResponse() {
+    public List<GetAccommodationCacheResponse> findAccommodationTodayTop10() {
 
         String key = "views_ranking";
         List<Object> resultList = redisTemplate.opsForList().range(key, 0, -1);
@@ -131,12 +131,13 @@ public class AccommodationService {
         for (ZSetOperations.TypedTuple<Object> tuple : result) {
 
             Long accommodationId = Long.parseLong(tuple.getValue().toString());
-            Accommodation accommodation = accommodationRepository.findById(accommodationId).orElseThrow(
-                    () -> new CustomException(ErrorCode.ACCOMMODATION_NOT_FOUND));
+            Accommodation accommodation = accommodationRepository.findById(accommodationId).orElse(null);
 
-            GetAccommodationCacheResponse response = GetAccommodationCacheResponse.from(accommodation);
-
-            redisTemplate.opsForList().rightPush(rankingKey, response);
+            if (accommodation != null) {
+                GetAccommodationCacheResponse response = GetAccommodationCacheResponse.from(accommodation);
+                redisTemplate.opsForList().rightPush(rankingKey, response);
+            }
         }
     }
+
 }

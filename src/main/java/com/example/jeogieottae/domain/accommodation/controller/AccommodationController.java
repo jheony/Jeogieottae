@@ -44,7 +44,7 @@ public class AccommodationController {
     @GetMapping("/views/ranking")
     public ResponseEntity<GlobalResponse<List<GetAccommodationCacheResponse>>> findAccommodationTodayTop10() {
 
-        List<GetAccommodationCacheResponse> response = accommodationService.GetAccommodationCacheResponse();
+        List<GetAccommodationCacheResponse> response = accommodationService.findAccommodationTodayTop10();
 
         return ResponseEntity.ok(GlobalResponse.success(true, "일일 조회수 랭킹 조회 성공", response));
     }

@@ -29,9 +29,7 @@ public class CouponController {
 
             @PageableDefault(
                     page = 0,
-                    size = 10,
-                    sort = "expiresAt",
-                    direction = Sort.Direction.ASC
+                    size = 10
             )
             Pageable pageable,
             @RequestParam(required = false) String accommodation,

@@ -9,6 +9,7 @@ import com.example.jeogieottae.domain.coupon.repository.CouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,15 +20,13 @@ public class CouponService {
     private final CouponRepository couponRepository;
 
     @Transactional(readOnly = true)
-    public CustomPageResponse<CouponResponse> getCouponList(Pageable pageable,
+    public Slice<CouponResponse> getCouponList(Pageable pageable,
                                                             AccommodationType accommodation,
                                                             CouponType discount,
                                                             Long minPrice
     ) {
-        Page<Coupon> couponPageList = couponRepository.findCouponList(pageable, accommodation, discount, minPrice);
-        Page<CouponResponse> couponResponsePage = couponPageList.map(CouponResponse::from);
+        Slice<Coupon> couponPageList = couponRepository.findCouponList(accommodation, discount, minPrice, pageable);
 
-        return CustomPageResponse.from(couponResponsePage);
+        return couponPageList.map(CouponResponse::from);
     }
-
 }

@@ -92,9 +92,7 @@ public class ReservationService {
     @Transactional
     public ReservationResponse deleteReservation(Long userId, Long reservationId) {
 
-        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(
-                () -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND)
-        );
+        Reservation reservation = reservationRepository.findByIdWithUserAndAccommodation(reservationId);
 
         if (reservation.getIsDeleted()) {
             throw new CustomException(ErrorCode.RESERVATION_NOT_FOUND);

@@ -1,15 +1,21 @@
 package com.example.jeogieottae.domain.coupon.controller;
 
-import com.example.jeogieottae.common.response.CustomPageResponse;
 import com.example.jeogieottae.common.response.GlobalResponse;
+import com.example.jeogieottae.domain.accommodation.enums.AccommodationType;
 import com.example.jeogieottae.domain.coupon.dto.response.CouponResponse;
+import com.example.jeogieottae.domain.coupon.enums.CouponType;
 import com.example.jeogieottae.domain.coupon.service.CouponService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,17 +25,23 @@ public class CouponController {
     private final CouponService couponService;
 
     @GetMapping
-    public ResponseEntity<GlobalResponse<CustomPageResponse<CouponResponse>>> getAllCoupons(
+    public ResponseEntity<GlobalResponse<Slice<CouponResponse>>> getCouponList(
 
             @PageableDefault(
                     page = 0,
-                    size = 10,
-                    sort = "expiresAt",
-                    direction = Sort.Direction.ASC
+                    size = 10
             )
-            Pageable pageable
+            Pageable pageable,
+            @RequestParam(required = false) String accommodation,
+            @RequestParam(required = false) String discount,
+            @RequestParam(required = false) Long minPriceValue
     ) {
-        CustomPageResponse<CouponResponse> result = couponService.getAllCoupons(pageable);
+        AccommodationType accommodationType = accommodation == null ? AccommodationType.HOTEL : AccommodationType.valueOf(accommodation);
+        CouponType discountType = discount == null ? CouponType.FIXED : CouponType.valueOf(discount);
+        Long minPrice = minPriceValue == null ? 0 : minPriceValue;
+
+        Slice<CouponResponse> result = couponService.getCouponList(pageable, accommodationType, discountType, minPrice);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(GlobalResponse.success(true, "쿠폰 목록 조회 성공", result));

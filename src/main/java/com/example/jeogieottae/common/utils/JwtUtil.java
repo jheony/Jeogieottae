@@ -1,4 +1,4 @@
-package com.example.jeogieottae.common.util;
+package com.example.jeogieottae.common.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

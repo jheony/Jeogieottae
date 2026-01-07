@@ -1,4 +1,4 @@
-package com.example.jeogieottae.common.util;
+package com.example.jeogieottae.common.utils;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;

@@ -74,4 +74,5 @@ jobs:
             -e "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" \
             -e "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" \
             -e "SPRING_DATA_REDIS_HOST=${{secrets.SPRING_DATA_REDIS_HOST}}" \
+            -e "SERVER_NAME=${{secrets.SERVER_NAME}}" \
             dperado/jeogieottaeserver:latest

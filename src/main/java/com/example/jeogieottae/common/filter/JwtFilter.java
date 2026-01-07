@@ -1,7 +1,7 @@
 package com.example.jeogieottae.common.filter;
 
 import com.example.jeogieottae.common.dto.AuthUser;
-import com.example.jeogieottae.common.util.JwtUtil;
+import com.example.jeogieottae.common.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @Slf4j
@@ -23,10 +24,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
 
+    private static final Set<String> EXCLUDED_URIS = Set.of(
+            "/auth/signup",
+            "/auth/signin",
+            "/coupons",
+            "/accommodations",
+            "/infra"
+    );
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String uri = request.getRequestURI();
-        return uri.equals("/auth/signup") || uri.equals("/auth/signin")|| uri.equals("/coupons")|| uri.equals("/accommodations");
+        return EXCLUDED_URIS.contains(request.getRequestURI());
     }
 
     @Override

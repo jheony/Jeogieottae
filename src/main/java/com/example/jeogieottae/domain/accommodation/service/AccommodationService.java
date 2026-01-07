@@ -6,6 +6,7 @@ import com.example.jeogieottae.common.response.CustomPageResponse;
 import com.example.jeogieottae.domain.accommodation.dto.condition.SearchAccommodationCond;
 import com.example.jeogieottae.domain.accommodation.dto.response.AccommodationResponse;
 import com.example.jeogieottae.domain.accommodation.dto.response.GetAccommodationCacheResponse;
+import com.example.jeogieottae.domain.accommodation.dto.response.GetAccommodationResponse;
 import com.example.jeogieottae.domain.accommodation.entity.Accommodation;
 import com.example.jeogieottae.domain.accommodation.repository.AccommodationRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,7 +48,7 @@ public class AccommodationService {
     }
 
     @Transactional(readOnly = true)
-    public GetAccommodationCacheResponse getAccommodation(Long accommodationId) {
+    public GetAccommodationCacheResponse getAccommodation(Long accommodationId, String ipAddress) {
 
         String key = "accommodation: " + accommodationId;
 
@@ -60,17 +62,27 @@ public class AccommodationService {
 
             redisTemplate.opsForValue().set(key, response);
             redisTemplate.expire(key, 1, TimeUnit.HOURS);
+        }
+
+        String checkIp = accommodationId + ":" + ipAddress;
+
+        boolean isNotViewed = redisTemplate.opsForValue().setIfAbsent(checkIp, "viewed", Duration.ofMinutes(5));
+
+        if (isNotViewed) {
 
             String currentKey = "current_accommodation_views";
-            redisTemplate.opsForZSet().incrementScore(currentKey, accommodationId, 1);
-            redisTemplate.expire(currentKey, 1, TimeUnit.HOURS);
+            saveCache(currentKey, accommodationId, TimeUnit.HOURS);
 
             String dailyKey = "daily_accommodation_views: " + LocalDate.now();
-            redisTemplate.opsForZSet().incrementScore(dailyKey, accommodationId, 1);
-            redisTemplate.expire(dailyKey, 1, TimeUnit.DAYS);
+            saveCache(dailyKey, accommodationId, TimeUnit.DAYS);
         }
 
         return response;
+    }
+
+    private void saveCache(String key, Long accommodationId, TimeUnit days) {
+        redisTemplate.opsForZSet().incrementScore(key, accommodationId, 1);
+        redisTemplate.expire(key, 1, days);
     }
 
     @Scheduled(cron = "0 0/5 * * * *")

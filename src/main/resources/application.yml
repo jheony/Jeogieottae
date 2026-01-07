@@ -57,3 +57,5 @@ spring:
 
   profiles:
     active: dev
+app:
+  server-name: ${SERVER_NAME:unknown}

@@ -2,8 +2,8 @@ package com.example.jeogieottae.domain.auth.service;
 
 import com.example.jeogieottae.common.exception.CustomException;
 import com.example.jeogieottae.common.exception.ErrorCode;
-import com.example.jeogieottae.common.util.JwtUtil;
-import com.example.jeogieottae.common.util.PasswordEncoder;
+import com.example.jeogieottae.common.utils.JwtUtil;
+import com.example.jeogieottae.common.utils.PasswordEncoder;
 import com.example.jeogieottae.domain.auth.dto.request.SignInRequest;
 import com.example.jeogieottae.domain.auth.dto.request.SignUpRequest;
 import com.example.jeogieottae.domain.auth.dto.response.SignInResponse;

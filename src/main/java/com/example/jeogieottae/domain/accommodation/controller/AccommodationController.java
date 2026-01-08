@@ -8,6 +8,7 @@ import com.example.jeogieottae.domain.accommodation.service.AccommodationSearchS
 import com.example.jeogieottae.domain.accommodation.service.AccommodationService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@ConditionalOnProperty(name = "app.features.search-enabled", havingValue = "true", matchIfMissing = true)
 @RequestMapping("/accommodations")
 public class AccommodationController {
 

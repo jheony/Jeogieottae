@@ -1,4 +1,4 @@
-package com.example.jeogieottae.common.util;
+package com.example.jeogieottae.common.utils;
 
 import com.example.jeogieottae.common.exception.CustomException;
 import com.example.jeogieottae.common.exception.ErrorCode;

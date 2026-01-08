@@ -6,11 +6,21 @@ on:
       - dev
     types:
       - closed
+  push:
+    branches:
+      - infra
 
 jobs:
   build-and-deploy:
-    if: github.event.pull_request.merged == true
+    if: >
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+      || (github.event_name == 'push' && github.ref == 'refs/heads/infra')
+
     runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/jeogieottaeserver
+      IMAGE_TAG: ${{ github.sha }}
 
     steps:
       - name: Checkout Code
@@ -20,7 +30,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
 
       - name: Give execute permission to gradlew
         run: chmod +x gradlew
@@ -28,14 +38,11 @@ jobs:
       - name: Set up Docker Buildx
         run: docker buildx create --use
 
-      - name: Build Docker Image with Gradle cache
+      - name: Build Docker Image
         run: |
           docker buildx build \
-            --build-arg GRADLE_USER_HOME=/home/gradle/.gradle \
-            --cache-to=type=local,dest=/tmp/.gradle-cache,mode=max \
-            --cache-from=type=local,src=/tmp/.gradle-cache \
             --no-cache \
-            -t ${{ secrets.DOCKER_USERNAME }}/jeogieottaeserver:latest \
+            -t $IMAGE_NAME:$IMAGE_TAG \
             --load .
 
       - name: Docker Login
@@ -45,34 +52,72 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Push Docker Image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/jeogieottaeserver:latest
+        run: docker push $IMAGE_NAME:$IMAGE_TAG
 
-      - name: Deploy to EC2
+      # DEPLOY SERVER 1 + HEALTH CHECK (on EC2)
+      - name: Deploy to EC2 SERVER 1 (with health check)
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.EC2_HOST }}
+          host: ${{ secrets.EC2_HOST_1 }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            echo "Pull latest Docker image"
-            docker pull ${{ secrets.DOCKER_USERNAME }}/jeogieottaeserver:latest
-            
-            echo "Stop containers using port 8080"
-            docker ps -q --filter "publish=8080" | xargs -r docker stop
-            docker ps -aq --filter "publish=8080" | xargs -r docker rm
-            
-            echo "Remove old containers named jeogieottae (if any)"
-            docker rm -f jeogieottae || true
-            
-            echo "Clean unused images"
-            docker image prune -f
-            
-            echo "Run new container"
-            docker run -d --name jeogieottae -p 8080:8080 \
-            -e "SPRING_DATASOURCE_URL=jdbc:mysql://database-1.c0pu8i0ekw5y.us-east-1.rds.amazonaws.com:3306/jeogieottae?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul" \
-            -e "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" \
-            -e "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" \
-            -e "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" \
-            -e "SPRING_DATA_REDIS_HOST=${{secrets.SPRING_DATA_REDIS_HOST}}" \
-            -e "SERVER_NAME=${{secrets.SERVER_NAME}}" \
-            dperado/jeogieottaeserver:latest
+            set -e
+
+            echo "IMAGE=${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+            docker pull "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+
+            docker stop jeogieottae || true
+            docker rm jeogieottae || true
+
+            docker run -d \
+              --name jeogieottae \
+              -p 8080:8080 \
+              --env-file .env \
+              "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+
+            echo "Waiting for SERVER 1 health..."
+            for i in {1..30}; do
+              if curl -sf http://localhost:8080/infra > /dev/null; then
+                echo "SERVER 1 healthy"
+                exit 0
+              fi
+              sleep 5
+            done
+
+            echo "SERVER 1 health check failed"
+            exit 1
+
+      # DEPLOY SERVER 2 + HEALTH CHECK (on EC2)
+      - name: Deploy to EC2 SERVER 2 (with health check)
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST_2 }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+
+            echo "IMAGE=${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+            docker pull "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+
+            docker stop jeogieottae || true
+            docker rm jeogieottae || true
+
+            docker run -d \
+              --name jeogieottae \
+              -p 8080:8080 \
+              --env-file .env \
+              "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+
+            echo "Waiting for SERVER 2 health..."
+            for i in {1..30}; do
+              if curl -sf http://localhost:8080/infra > /dev/null; then
+                echo "SERVER 2 healthy"
+                exit 0
+              fi
+              sleep 5
+            done
+
+            echo "SERVER 2 health check failed"
+            exit 1

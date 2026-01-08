@@ -6,6 +6,7 @@ import com.example.jeogieottae.domain.accommodation.dto.condition.SearchAccommod
 import com.example.jeogieottae.domain.accommodation.dto.response.AccommodationResponse;
 import com.example.jeogieottae.domain.accommodation.dto.response.GetAccommodationCacheResponse;
 import com.example.jeogieottae.domain.accommodation.service.AccommodationService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -34,9 +35,11 @@ public class AccommodationController {
     }
 
     @GetMapping("/{accommodationId}")
-    public ResponseEntity<GlobalResponse<GetAccommodationCacheResponse>> getAccommodation(@PathVariable Long accommodationId) {
+    public ResponseEntity<GlobalResponse<GetAccommodationCacheResponse>> getAccommodation(@PathVariable Long accommodationId, HttpServletRequest request) {
 
-        GetAccommodationCacheResponse response = accommodationService.getAccommodation(accommodationId);
+        String ipAddress = request.getRemoteAddr();
+
+        GetAccommodationCacheResponse response = accommodationService.getAccommodation(accommodationId, ipAddress);
 
         return ResponseEntity.ok(GlobalResponse.success(true, "숙소 상세 조회 성공", response));
     }

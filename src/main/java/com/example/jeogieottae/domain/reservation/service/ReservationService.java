@@ -3,6 +3,7 @@ package com.example.jeogieottae.domain.reservation.service;
 import com.example.jeogieottae.common.exception.CustomException;
 import com.example.jeogieottae.common.exception.ErrorCode;
 import com.example.jeogieottae.common.response.CustomPageResponse;
+import com.example.jeogieottae.domain.accommodation.service.AccommodationSyncService;
 import com.example.jeogieottae.domain.coupon.entity.Coupon;
 import com.example.jeogieottae.domain.coupon.enums.CouponType;
 import com.example.jeogieottae.domain.reservation.dto.CreateReservationRequest;
@@ -21,12 +22,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
+    private final AccommodationSyncService accommodationSyncService;
 
     @Transactional
     public CreateReservationResponse createReservation(
@@ -63,6 +67,8 @@ public class ReservationService {
         Reservation reservation = reservationRepository.save(
                 Reservation.create(user, room, couponName, originalPrice, discountPrice, request));
 
+        accommodationSyncService.syncAccommodation(room.getAccommodation().getId());
+
         return CreateReservationResponse.from(reservation, userRoom);
     }
 
@@ -83,10 +89,26 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPageResponse<ReservationResponse> getAllMyReservation(Long userId, Pageable pageable) {
+    public CustomPageResponse<ReservationResponse> getMyReservationList(Long userId, Pageable pageable) {
 
         Page<ReservationResponse> response = reservationRepository.findAllById(userId, pageable);
         return CustomPageResponse.from(response);
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationResponse getMyReservation(Long reservationId) {
+
+        Reservation reservation = reservationRepository.findByIdWithUserAndAccommodation(reservationId);
+
+        if (reservation.getIsDeleted()) {
+            throw new CustomException(ErrorCode.RESERVATION_NOT_FOUND);
+        }
+
+        if (reservation.getPaymentDeadline().isBefore(LocalDateTime.now())) {
+            throw new CustomException(ErrorCode.PAYMENT_NOT_AVAILABLE);
+        }
+
+        return ReservationResponse.from(reservation);
     }
 
     @Transactional

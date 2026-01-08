@@ -29,42 +29,43 @@ public class JwtFilter extends OncePerRequestFilter {
             "/auth/signin",
             "/coupons",
             "/accommodations",
-            "/infra"
+            "/oauth2",
+            "/login/oauth2",
+            "/infra",
+            "/success.html",
+            "/fail.html"
     );
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return EXCLUDED_URIS.contains(request.getRequestURI());
+        String uri = request.getRequestURI();
+        return EXCLUDED_URIS.contains(uri)
+                || uri.startsWith("/reservations/one/")
+                || uri.startsWith("/payments/");
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
 
-        String authorizationHeader = request.getHeader("Authorization");
+        String token = extractToken(request);
 
-        if (authorizationHeader == null || authorizationHeader.isBlank()) {
+        if (token == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        if (!authorizationHeader.startsWith("Bearer ")) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰 헤더");
-            return;
-        }
-
-        String jwt = authorizationHeader.substring(7);
-
-        if (!jwtUtil.validateToken(jwt)) {
+        if (!jwtUtil.validateToken(token)) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰");
             return;
         }
 
-        Long userId = jwtUtil.extractUserId(jwt);
-        String userEmail = jwtUtil.extractUserEmail(jwt);
-        String username = jwtUtil.extractUsername(jwt);
+        Long userId = jwtUtil.extractUserId(token);
+        String userEmail = jwtUtil.extractUserEmail(token);
+        String username = jwtUtil.extractUsername(token);
 
         AuthUser authUser = AuthUser.of(userId, userEmail, username);
 
@@ -75,4 +76,25 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    private String extractToken(HttpServletRequest request) {
+
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith(JwtUtil.BEARER_PREFIX)) {
+            return header.substring(JwtUtil.BEARER_PREFIX.length());
+        }
+
+        if (request.getCookies() == null) return null;
+
+        for (var cookie : request.getCookies()) {
+            if ("accessToken".equals(cookie.getName())) {
+                String value = cookie.getValue();
+                if (value.startsWith(JwtUtil.BEARER_PREFIX)) {
+                    return value.substring(JwtUtil.BEARER_PREFIX.length());
+                }
+                return value;
+            }
+        }
+
+        return null;
+    }
 }

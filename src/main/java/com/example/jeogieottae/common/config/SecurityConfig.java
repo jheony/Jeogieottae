@@ -1,6 +1,8 @@
 package com.example.jeogieottae.common.config;
 
 import com.example.jeogieottae.common.filter.JwtFilter;
+import com.example.jeogieottae.common.utils.OAuth2SuccessHandler;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +25,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -36,11 +39,24 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/infra").permitAll()
-                        .requestMatchers("/auth/signup", "/auth/signin").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/coupons", "/accommodations").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/signin", "/sync/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/coupons", "/accommodations/**").permitAll()
+                        .requestMatchers(
+                                "/oauth2/**",
+                                "/login/oauth2/**"
+                        ).permitAll()
+                        .requestMatchers("/reservations/one/**").permitAll()
+                        .requestMatchers("/payment_page.html", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/payments/success", "/payments/fail", "/payments/confirm").permitAll()
+                        .requestMatchers("/success.html", "/payments/fail.html").permitAll()
                         .anyRequest().authenticated()
                 )
-
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                        })
+                )
+                .oauth2Login(oauth -> oauth.successHandler(oAuth2SuccessHandler))
                 .addFilterBefore(jwtFilter, SecurityContextHolderAwareRequestFilter.class)
                 .build();
     }

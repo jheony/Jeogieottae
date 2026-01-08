@@ -1,0 +1,16 @@
+{
+  "analysis": {
+    "tokenizer": {
+      "jeogieottae_nori_tokenizer": {
+        "type": "nori_tokenizer",
+        "decompound_mode": "mixed"
+      }
+    },
+    "analyzer": {
+      "nori_analyzer": {
+        "type": "custom",
+        "tokenizer": "jeogieottae_nori_tokenizer"
+      }
+    }
+  }
+}

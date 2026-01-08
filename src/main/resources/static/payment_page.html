@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>결제 테스트</title>
+    <!-- 토스페이먼츠 결제 위젯 SDK -->
+    <script src="https://js.tosspayments.com/v2/standard"></script>
+</head>
+<body>
+<!-- 결제 UI -->
+<div id="payment-method"></div>
+<!-- 이용약관 UI -->
+<div id="agreement"></div>
+<!-- 결제하기 버튼 -->
+<button class="button" id="payment-button" style="margin-top: 30px">결제하기</button>
+
+<style>
+    #payment-button {
+        padding: 11px 22px;
+        border: none;
+        border-radius: 8px;
+        background-color: #3282f6;
+        color: #f9fcff;
+        font-weight: 600;
+        font-size: 17px;
+        cursor: pointer;
+    }
+    #payment-button:hover {
+        background-color: #1a5fd0;
+    }
+</style>
+
+<script>
+
+    main();
+
+    async function main() {
+        const button = document.getElementById("payment-button");
+        const coupon = document.getElementById("coupon-box");
+
+        const reservationId = 1;
+
+        const reservation = await fetch("http://localhost:8080/reservations/one/" + reservationId)
+            .then(res => res.json())
+            .then(data => data.data);
+
+        const now = Date.now();
+
+        const orderId = reservation.reservationId + "-" + now;
+
+
+        // ------  결제위젯 초기화 ------
+        const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
+        const tossPayments = TossPayments(clientKey);
+        // 회원 결제
+        const customerKey = reservation.name;
+        const widgets = tossPayments.widgets({
+            customerKey,
+        });
+
+        // ------ 주문의 결제 금액 설정 ------
+        let amount = reservation.price
+        await widgets.setAmount({
+            currency: "KRW",
+            value: amount,
+        });
+
+        await Promise.all([
+            // ------  결제 UI 렌더링 ------
+            widgets.renderPaymentMethods({
+                selector: "#payment-method",
+                variantKey: "DEFAULT",
+            }),
+            // ------  이용약관 UI 렌더링 ------
+            widgets.renderAgreement({selector: "#agreement", variantKey: "AGREEMENT"}),
+        ]);
+
+        // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
+        button.addEventListener("click", async function () {
+            await widgets.requestPayment({
+                orderId: String(orderId), // 예약 ID를 주문번호로 사용
+                orderName: reservation.accommodationName, // 숙소 이름을 주문명으로 사용
+                successUrl: "http://localhost:8080/payments/success",
+                failUrl: "http://localhost:8080/payments/fail",
+                customerEmail: "customer123@gmail.com", // 필요 시 Reservation에 추가 가능
+                customerName: reservation.name,
+                customerMobilePhone: "01012341234", // 필요 시 Reservation에 추가 가능
+            });
+        });
+    }
+</script>
+</body>
+</html>

@@ -7,8 +7,9 @@ public enum ErrorCode {
     //------409-----------------------
     USER_ALREADY_EXISTS(409, "이미 존재하는 사용자 이메일입니다."),
     COUPON_ALREADY_USED(409, "이미 사용한 쿠폰입니다."),
+    PAID_RESERVATION(409, "이미 결제된 상품 입니다."),
     RESERVATION_NOT_AVAILABLE(409, "예약일자가 기존 예약과 중복됩니다."),
-    COUPON_EVENT_CONFLICT(409,"현재 쿠폰 발급 처리중입니다. 잠시 후 다시 시도해 주세요."),
+    COUPON_EVENT_CONFLICT(409, "현재 쿠폰 발급 처리중입니다. 잠시 후 다시 시도해 주세요."),
 
     //------404-----------------------
     USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
@@ -20,6 +21,7 @@ public enum ErrorCode {
     USER_NOT_MATCH(403, "접근 권한이 없습니다"),
     PASSWORD_NOT_MATCH(403, "비밀번호가 일치하지 않습니다."),
     FORBIDDEN(403, "접근 권한이 없습니다"),
+    PAYMENT_NOT_AVAILABLE(403, "결제 시간이 만료되었습니다."),
 
     //------401-----------------------
     LOGIN_REQUIRED(401, "로그인한 유저만 사용할 수 있는 기능입니다"),

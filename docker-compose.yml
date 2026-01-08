@@ -1,3 +1,4 @@
+version: '3.7'
 
 services:
   mysql:
@@ -8,14 +9,45 @@ services:
       MYSQL_DATABASE: jeogieottae
       TZ: Asia/Seoul
     command:
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_unicode_ci
-      --local-infile=1
-      --innodb_redo_log_capacity=4G
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --local-infile=1
+      - --innodb_redo_log_capacity=4G
     ports:
       - "3307:3306"
     volumes:
       - ./csv:/var/lib/mysql-files
       - ./mysql-init:/docker-entrypoint-initdb.d
+      - mysql-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  elasticsearch:
+    build:
+      context: ./elasticsearch
+      dockerfile: Dockerfile
+    container_name: jeogieottae_es
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
 volumes:
-    mysql-data:
+  mysql-data:
+  es-data:

@@ -2,15 +2,10 @@ package com.example.jeogieottae.domain.accommodation.service;
 
 import com.example.jeogieottae.common.exception.CustomException;
 import com.example.jeogieottae.common.exception.ErrorCode;
-import com.example.jeogieottae.common.response.CustomPageResponse;
-import com.example.jeogieottae.domain.accommodation.dto.condition.SearchAccommodationCond;
-import com.example.jeogieottae.domain.accommodation.dto.response.AccommodationResponse;
 import com.example.jeogieottae.domain.accommodation.dto.response.GetAccommodationCacheResponse;
 import com.example.jeogieottae.domain.accommodation.entity.Accommodation;
 import com.example.jeogieottae.domain.accommodation.repository.AccommodationRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -30,20 +24,6 @@ public class AccommodationService {
 
     private final AccommodationRepository accommodationRepository;
     private final RedisTemplate<String, Object> redisTemplate;
-
-    @Transactional(readOnly = true)
-    public CustomPageResponse<AccommodationResponse> searchAccommodations(SearchAccommodationCond cond, Pageable pageable) {
-
-        if (cond.getStartDate() == null) {
-            cond.setStartDate(LocalDateTime.now());
-        }
-        if (cond.getEndDate() == null) {
-            cond.setEndDate(cond.getStartDate().plusDays(1));
-        }
-
-        Page<AccommodationResponse> page = accommodationRepository.searchAccommodations(cond, pageable);
-        return CustomPageResponse.from(page);
-    }
 
     @Transactional(readOnly = true)
     public GetAccommodationCacheResponse getAccommodation(Long accommodationId) {

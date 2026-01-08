@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface AccommodationRepository extends JpaRepository<Accommodation, Long>, QAccommodationRepository {
+public interface AccommodationRepository extends JpaRepository<Accommodation, Long> {
 
     Page<Accommodation> findAll(Pageable pageable);
 

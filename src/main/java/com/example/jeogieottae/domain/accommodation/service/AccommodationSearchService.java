@@ -11,6 +11,7 @@ import com.example.jeogieottae.domain.accommodation.dto.response.AccommodationRe
 import com.example.jeogieottae.domain.accommodation.enums.AccommodationSortType;
 import com.example.jeogieottae.domain.accommodation.enums.City;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -33,6 +34,9 @@ public class AccommodationSearchService {
 
     private final ElasticsearchOperations elasticsearchOperations;
 
+    @Cacheable(value = "accommodationSearch",
+            key = "#cond.toString() + #pageable.pageNumber",
+            unless = "#result.isEmpty()")
     public Slice<AccommodationResponse> searchAccommodations(SearchAccommodationCond cond, Pageable pageable) {
 
         applyCityFromKeyword(cond);

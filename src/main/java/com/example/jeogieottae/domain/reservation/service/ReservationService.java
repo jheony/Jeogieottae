@@ -30,7 +30,6 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
-    private final AccommodationSyncService accommodationSyncService;
 
     @Transactional
     public CreateReservationResponse createReservation(
@@ -66,8 +65,6 @@ public class ReservationService {
 
         Reservation reservation = reservationRepository.save(
                 Reservation.create(user, room, couponName, originalPrice, discountPrice, request));
-
-        accommodationSyncService.syncAccommodation(room.getAccommodation().getId());
 
         return CreateReservationResponse.from(reservation, userRoom);
     }

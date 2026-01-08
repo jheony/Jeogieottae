@@ -29,7 +29,6 @@ public class JwtFilter extends OncePerRequestFilter {
             "/auth/signin",
             "/coupons",
             "/accommodations",
-            "/infra",
             "/oauth2",
             "/login/oauth2",
             "/infra",

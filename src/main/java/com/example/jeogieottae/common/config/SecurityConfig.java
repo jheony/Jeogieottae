@@ -1,7 +1,7 @@
 package com.example.jeogieottae.common.config;
 
 import com.example.jeogieottae.common.filter.JwtFilter;
-import com.example.jeogieottae.common.util.OAuth2SuccessHandler;
+import com.example.jeogieottae.common.utils.OAuth2SuccessHandler;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

@@ -30,7 +30,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
 
       - name: Give execute permission to gradlew
         run: chmod +x gradlew
@@ -54,15 +54,19 @@ jobs:
       - name: Push Docker Image
         run: docker push $IMAGE_NAME:$IMAGE_TAG
 
-      # DEPLOY SERVER 1
-      - name: Deploy to EC2 SERVER 1
+      # DEPLOY SERVER 1 + HEALTH CHECK (on EC2)
+      - name: Deploy to EC2 SERVER 1 (with health check)
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST_1 }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker pull $IMAGE_NAME:$IMAGE_TAG
+            set -e
+
+            echo "IMAGE=${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+            docker pull "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+
             docker stop jeogieottae || true
             docker rm jeogieottae || true
 
@@ -70,29 +74,33 @@ jobs:
               --name jeogieottae \
               -p 8080:8080 \
               --env-file .env \
-              $IMAGE_NAME:$IMAGE_TAG
+              "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
 
-      - name: Health check SERVER 1
-        run: |
-          for i in {1..30}; do
-            if curl -sf http://${{ secrets.EC2_HOST_1 }}:8080/infra > /dev/null; then
-              echo "SERVER 1 healthy"
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "SERVER 1 health check failed"
-          exit 1
+            echo "Waiting for SERVER 1 health..."
+            for i in {1..30}; do
+              if curl -sf http://localhost:8080/infra > /dev/null; then
+                echo "SERVER 1 healthy"
+                exit 0
+              fi
+              sleep 5
+            done
 
-      # DEPLOY SERVER 2
-      - name: Deploy to EC2 SERVER 2
+            echo "SERVER 1 health check failed"
+            exit 1
+
+      # DEPLOY SERVER 2 + HEALTH CHECK (on EC2)
+      - name: Deploy to EC2 SERVER 2 (with health check)
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST_2 }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker pull $IMAGE_NAME:$IMAGE_TAG
+            set -e
+
+            echo "IMAGE=${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+            docker pull "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+
             docker stop jeogieottae || true
             docker rm jeogieottae || true
 
@@ -100,16 +108,16 @@ jobs:
               --name jeogieottae \
               -p 8080:8080 \
               --env-file .env \
-              $IMAGE_NAME:$IMAGE_TAG
+              "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
 
-      - name: Health check SERVER 2
-        run: |
-          for i in {1..30}; do
-            if curl -sf http://${{ secrets.EC2_HOST_2 }}:8080/infra > /dev/null; then
-              echo "SERVER 2 healthy"
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "SERVER 2 health check failed"
-          exit 1
+            echo "Waiting for SERVER 2 health..."
+            for i in {1..30}; do
+              if curl -sf http://localhost:8080/infra > /dev/null; then
+                echo "SERVER 2 healthy"
+                exit 0
+              fi
+              sleep 5
+            done
+
+            echo "SERVER 2 health check failed"
+            exit 1

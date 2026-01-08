@@ -1,21 +1,18 @@
 package com.example.jeogieottae.domain.payment.controller;
 
+import com.example.jeogieottae.common.dto.AuthUser;
+import com.example.jeogieottae.common.response.GlobalResponse;
 import com.example.jeogieottae.domain.payment.dto.ConfirmRequest;
 import com.example.jeogieottae.domain.payment.dto.FailPaymentRequest;
-import com.example.jeogieottae.domain.payment.dto.PaymentRequest;
+import com.example.jeogieottae.domain.payment.dto.RequestPaymentResponse;
 import com.example.jeogieottae.domain.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Base64;
-
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/payments")
 public class PaymentController {
@@ -29,22 +26,10 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/request")
-    public ResponseEntity<String> requestPayment(@ModelAttribute PaymentRequest request) {
+    public ResponseEntity<GlobalResponse<RequestPaymentResponse>> requestPayment(@AuthenticationPrincipal AuthUser authUser, @RequestParam Long reservationId) {
 
-        WebClient client = WebClient.builder()
-                .baseUrl(baseUrl)
-                .defaultHeader(HttpHeaders.AUTHORIZATION,
-                        "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes()))
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
-
-        String response = client.post()
-                .bodyValue(request)   // 요청 바디에 orderId, orderName, amount, successUrl, failUrl 포함
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-
-        return ResponseEntity.ok(response);
+        RequestPaymentResponse response = paymentService.requestPayment(authUser.getUserId(), reservationId);
+        return ResponseEntity.ok(GlobalResponse.success(true, "결제 요청 완료", response));
     }
 
     @GetMapping("/success")

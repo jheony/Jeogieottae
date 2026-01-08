@@ -3,6 +3,7 @@ package com.example.jeogieottae.domain.payment.service;
 import com.example.jeogieottae.common.exception.CustomException;
 import com.example.jeogieottae.common.exception.ErrorCode;
 import com.example.jeogieottae.domain.payment.dto.ConfirmRequest;
+import com.example.jeogieottae.domain.payment.dto.RequestPaymentResponse;
 import com.example.jeogieottae.domain.reservation.entity.Reservation;
 import com.example.jeogieottae.domain.reservation.enums.ReservationPayment;
 import com.example.jeogieottae.domain.reservation.repository.ReservationRepository;
@@ -11,8 +12,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.LocalDateTime;
 import java.util.Base64;
 
 @Service
@@ -25,12 +28,34 @@ public class PaymentService {
     @Value("${spring.payment.base-url}")
     private String baseUrl;
 
-
     private final ReservationRepository reservationRepository;
     private final WebClient webClient = WebClient.builder().build();
 
-    public String successPayment(ConfirmRequest request) {
+    @Transactional
+    public RequestPaymentResponse requestPayment(Long userId, Long reservationId) {
 
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(
+                () -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND)
+        );
+
+        if (!reservation.getUser().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
+        if (reservation.getPayment().equals(ReservationPayment.SUCCESS)) {
+            throw new CustomException(ErrorCode.PAID_RESERVATION);
+        }
+
+        if (reservation.getPaymentDeadline().isBefore(LocalDateTime.now())) {
+            throw new CustomException(ErrorCode.PAYMENT_NOT_AVAILABLE);
+        }
+
+        String paymentUrl = "http://localhost:8080/payment_page.html?reservationId=" + reservationId;
+        return RequestPaymentResponse.from(paymentUrl);
+    }
+
+    @Transactional
+    public String successPayment(ConfirmRequest request) {
 
         String response = webClient.post()
                 .uri(baseUrl + "/confirm")

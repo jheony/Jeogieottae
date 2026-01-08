@@ -37,6 +37,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/signup", "/auth/signin").permitAll()
                         .requestMatchers(HttpMethod.GET, "/coupons", "/accommodations").permitAll()
+                        .requestMatchers("/reservations/one/**").permitAll()
+                        .requestMatchers("/payment_page.html", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/payments/success", "/payments/fail").permitAll()
                         .anyRequest().authenticated()
                 )
 

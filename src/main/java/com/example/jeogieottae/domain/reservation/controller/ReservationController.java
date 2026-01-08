@@ -32,7 +32,7 @@ public class ReservationController {
     }
 
     @GetMapping
-    public ResponseEntity<CustomPageResponse<ReservationResponse>> getAllMyReservationList(
+    public ResponseEntity<CustomPageResponse<ReservationResponse>> getMyReservationList(
 
             @PageableDefault(
                     page = 0,
@@ -43,11 +43,18 @@ public class ReservationController {
             Pageable pageable,
             @AuthenticationPrincipal AuthUser authUser
     ) {
-        CustomPageResponse<ReservationResponse> response = reservationService.getAllMyReservation(authUser.getUserId(), pageable);
+        CustomPageResponse<ReservationResponse> response = reservationService.getMyReservationList(authUser.getUserId(), pageable);
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping
+    @GetMapping("/one/{reservationId}")
+    public ResponseEntity<GlobalResponse<ReservationResponse>> getMyReservation(@PathVariable Long reservationId) {
+
+        ReservationResponse response = reservationService.getMyReservation(reservationId);
+        return ResponseEntity.ok(GlobalResponse.success(true, "내역 조회 성공", response));
+    }
+
+    @DeleteMapping("/{reservationId}")
     public ResponseEntity<GlobalResponse<ReservationResponse>> deleteReservation(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long reservationId) {
 
         ReservationResponse response = reservationService.deleteReservation(authUser.getUserId(), reservationId);

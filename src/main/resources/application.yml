@@ -41,5 +41,5 @@ spring:
     active: dev
 
   payment:
-    secret:
-      key: ${PAYMENT_SECRET_KEY}
+    base-url: https://api.tosspayments.com/v1/payments
+    secret-key: ${PAYMENT_SECRET_KEY}

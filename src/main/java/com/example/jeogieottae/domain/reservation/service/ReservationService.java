@@ -83,10 +83,21 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPageResponse<ReservationResponse> getAllMyReservation(Long userId, Pageable pageable) {
+    public CustomPageResponse<ReservationResponse> getMyReservationList(Long userId, Pageable pageable) {
 
         Page<ReservationResponse> response = reservationRepository.findAllById(userId, pageable);
         return CustomPageResponse.from(response);
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationResponse getMyReservation(Long reservationId) {
+
+        Reservation reservation = reservationRepository.findByIdWithUserAndAccommodation(reservationId);
+
+        if (reservation.getIsDeleted()) {
+            throw new CustomException(ErrorCode.RESERVATION_NOT_FOUND);
+        }
+        return ReservationResponse.from(reservation);
     }
 
     @Transactional

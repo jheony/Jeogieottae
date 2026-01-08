@@ -58,6 +58,7 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
+    @Setter
     @Column(length = 20, nullable = false)
     @Enumerated(EnumType.STRING)
     private ReservationPayment payment;

@@ -39,6 +39,8 @@ spring:
 
   profiles:
     active: dev
+app:
+  server-name: ${SERVER_NAME:unknown}
 
   payment:
     base-url: https://api.tosspayments.com/v1/payments

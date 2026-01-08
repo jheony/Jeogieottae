@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/infra").permitAll()
-                        .requestMatchers("/auth/signup", "/auth/signin").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/signin", "/sync/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/coupons", "/accommodations").permitAll()
                         .requestMatchers(
                                 "/oauth2/**",

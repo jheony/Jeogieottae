@@ -35,5 +35,5 @@ public class SearchAccommodationCond {
 
     private AccommodationType type;
 
-    private AccommodationSortType sort;
+    private AccommodationSortType sortBy;
 }

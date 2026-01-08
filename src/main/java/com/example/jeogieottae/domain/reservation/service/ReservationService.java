@@ -22,6 +22,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
@@ -87,10 +89,26 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public CustomPageResponse<ReservationResponse> getAllMyReservation(Long userId, Pageable pageable) {
+    public CustomPageResponse<ReservationResponse> getMyReservationList(Long userId, Pageable pageable) {
 
         Page<ReservationResponse> response = reservationRepository.findAllById(userId, pageable);
         return CustomPageResponse.from(response);
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationResponse getMyReservation(Long reservationId) {
+
+        Reservation reservation = reservationRepository.findByIdWithUserAndAccommodation(reservationId);
+
+        if (reservation.getIsDeleted()) {
+            throw new CustomException(ErrorCode.RESERVATION_NOT_FOUND);
+        }
+
+        if (reservation.getPaymentDeadline().isBefore(LocalDateTime.now())) {
+            throw new CustomException(ErrorCode.PAYMENT_NOT_AVAILABLE);
+        }
+
+        return ReservationResponse.from(reservation);
     }
 
     @Transactional

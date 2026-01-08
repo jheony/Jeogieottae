@@ -32,11 +32,17 @@ public class JwtFilter extends OncePerRequestFilter {
             "/infra",
             "/oauth2",
             "/login/oauth2"
+            "/infra",
+            "/success.html",
+            "/fail.html"
     );
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return EXCLUDED_URIS.contains(request.getRequestURI());
+        String uri = request.getRequestURI();
+        return EXCLUDED_URIS.contains(uri)
+                || uri.startsWith("/reservations/one/")
+                || uri.startsWith("/payments/");
     }
 
     @Override

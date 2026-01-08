@@ -55,6 +55,10 @@ spring:
     secret:
       key: ${JWT_SECRET_KEY}
 
+  payment:
+    base-url: https://api.tosspayments.com/v1/payments
+    secret-key: ${PAYMENT_SECRET_KEY}
+
   profiles:
     active: dev
 
@@ -65,3 +69,4 @@ spring:
 
 app:
   server-name: ${SERVER_NAME:unknown}
+

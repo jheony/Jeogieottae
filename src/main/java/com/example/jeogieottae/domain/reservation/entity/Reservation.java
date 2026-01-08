@@ -1,6 +1,7 @@
 package com.example.jeogieottae.domain.reservation.entity;
 
 import com.example.jeogieottae.domain.reservation.dto.CreateReservationRequest;
+import com.example.jeogieottae.domain.reservation.enums.ReservationPayment;
 import com.example.jeogieottae.domain.reservation.enums.ReservationStatus;
 import com.example.jeogieottae.domain.room.entity.Room;
 import com.example.jeogieottae.domain.user.entity.User;
@@ -9,15 +10,14 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reservations", indexes = {
-                @Index(name = "idx_room_deleted_checkin_checkout",
-                        columnList = "room_id, is_deleted, check_in, check_out")
+        @Index(name = "idx_room_deleted_checkin_checkout",
+                columnList = "room_id, is_deleted, check_in, check_out")
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -58,13 +58,30 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
-    @CreatedDate
+    @Setter
+    @Column(length = 20, nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ReservationPayment payment;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "payment_deadline")
+    private LocalDateTime paymentDeadline;
 
     @Setter
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
+
+    @PrePersist
+    public void prePersist() {
+
+        if (this.status == null) this.status = ReservationStatus.RESERVED;
+        if (this.payment == null) this.payment = ReservationPayment.PENDING;
+        if (this.isDeleted == null) this.isDeleted = false;
+        if (this.createdAt == null) this.createdAt = LocalDateTime.now();
+        if (this.paymentDeadline == null) this.paymentDeadline = this.createdAt.plusMinutes(10);
+    }
 
     public static Reservation create(User user,
                                      Room room,
@@ -83,8 +100,6 @@ public class Reservation {
         reservation.guestCount = request.getGuest();
         reservation.originalPrice = originalPrice;
         reservation.discountedPrice = discountedPrice;
-        reservation.status = ReservationStatus.RESERVED;
-        reservation.isDeleted = false;
 
         return reservation;
     }

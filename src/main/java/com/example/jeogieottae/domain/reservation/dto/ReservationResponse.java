@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @RequiredArgsConstructor
 public class ReservationResponse {
+    private final Long reservationId;
     private final String name;
     private final String accommodationName;
     private final Long price;
@@ -18,6 +19,7 @@ public class ReservationResponse {
     public static ReservationResponse from(Reservation reservation) {
 
         return new ReservationResponse(
+                reservation.getId(),
                 reservation.getUser().getUsername(),
                 reservation.getRoom().getAccommodation().getName(),
                 reservation.getDiscountedPrice(),

@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 public class CheckSystemResponse {
 
     private final String hostname;
-    private final String instanceId;
     private final String servername;
 
 }

@@ -17,7 +17,6 @@ public class SystemController {
 
         return new CheckSystemResponse(
                 systemInfoProvider.getHostname(),
-                systemInfoProvider.getInstanceId(),
                 systemInfoProvider.getServerName()
         );
     }

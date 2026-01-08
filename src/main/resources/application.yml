@@ -17,6 +17,24 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
 
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            scope: profile_nickname, account_email
+            redirect-uri: ${KAKAO_REDIRECT_URI}
+            authorization-grant-type: authorization_code
+            client-authentication-method: client_secret_post
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
 
   config:
     import: optional:file:.env[.properties]
@@ -43,6 +61,12 @@ spring:
 
   profiles:
     active: dev
+
+  elasticsearch:
+    uris: http://localhost:9200
+    socket-timeout: 30s
+    connection-timeout: 5s
+
 app:
   server-name: ${SERVER_NAME:unknown}
 

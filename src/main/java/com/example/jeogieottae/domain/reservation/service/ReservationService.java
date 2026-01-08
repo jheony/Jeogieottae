@@ -3,6 +3,7 @@ package com.example.jeogieottae.domain.reservation.service;
 import com.example.jeogieottae.common.exception.CustomException;
 import com.example.jeogieottae.common.exception.ErrorCode;
 import com.example.jeogieottae.common.response.CustomPageResponse;
+import com.example.jeogieottae.domain.accommodation.service.AccommodationSyncService;
 import com.example.jeogieottae.domain.coupon.entity.Coupon;
 import com.example.jeogieottae.domain.coupon.enums.CouponType;
 import com.example.jeogieottae.domain.reservation.dto.CreateReservationRequest;
@@ -29,6 +30,7 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
+    private final AccommodationSyncService accommodationSyncService;
 
     @Transactional
     public CreateReservationResponse createReservation(
@@ -64,6 +66,8 @@ public class ReservationService {
 
         Reservation reservation = reservationRepository.save(
                 Reservation.create(user, room, couponName, originalPrice, discountPrice, request));
+
+        accommodationSyncService.syncAccommodation(room.getAccommodation().getId());
 
         return CreateReservationResponse.from(reservation, userRoom);
     }

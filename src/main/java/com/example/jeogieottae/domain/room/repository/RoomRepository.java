@@ -10,4 +10,8 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 
     @EntityGraph(attributePaths = {"specialPrice"})
     List<Room> findAllByAccommodationIdOrderByPriceAsc(Long accommodationId);
+
+    List<Room> findByAccommodationIdIn(List<Long> accommodationIds);
+
+    List<Room> findByAccommodationId(Long accommodationId);
 }

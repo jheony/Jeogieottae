@@ -1,5 +1,6 @@
 package com.example.jeogieottae.domain.auth.controller;
 
+import com.example.jeogieottae.common.dto.AuthUser;
 import com.example.jeogieottae.common.response.GlobalResponse;
 import com.example.jeogieottae.domain.auth.dto.request.SignInRequest;
 import com.example.jeogieottae.domain.auth.dto.request.SignUpRequest;
@@ -7,11 +8,11 @@ import com.example.jeogieottae.domain.auth.dto.response.SignInResponse;
 import com.example.jeogieottae.domain.auth.dto.response.SignUpResponse;
 import com.example.jeogieottae.domain.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/auth")
@@ -34,5 +35,13 @@ public class AuthController {
         SignInResponse response = authService.signIn(request);
 
         return ResponseEntity.ok(GlobalResponse.success(true, "로그인 성공", response));
+    }
+
+    @GetMapping("/me")
+    public AuthUser me(@AuthenticationPrincipal AuthUser authUser) {
+        if(authUser == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+        return authUser;
     }
 }

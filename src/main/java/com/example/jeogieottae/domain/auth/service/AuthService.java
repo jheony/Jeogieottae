@@ -32,7 +32,7 @@ public class AuthService {
             throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
         }
 
-        User user = User.create(userEmail, username, passwordEncoder.encode(request.getPassword()));
+        User user = User.createLocal(userEmail, username, passwordEncoder.encode(request.getPassword()));
 
         userRepository.save(user);
 

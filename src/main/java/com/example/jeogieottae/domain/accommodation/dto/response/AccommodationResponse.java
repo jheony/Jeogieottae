@@ -22,4 +22,13 @@ public class AccommodationResponse {
                 availableRooms
         );
     }
+
+    public static AccommodationResponse of(String name, long minPrice, double rating, Long availableCount) {
+        return new AccommodationResponse(
+                name,
+                minPrice,
+                rating,
+                availableCount
+        );
+    }
 }

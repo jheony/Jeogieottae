@@ -1,5 +1,6 @@
 package com.example.jeogieottae.domain.user.entity;
 
+import com.example.jeogieottae.domain.auth.enums.LoginType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,21 +22,39 @@ public class User {
     @Column(length = 100, nullable = false)
     private String username;
 
-    @Column(length = 200, nullable = false)
+    @Column(length = 200)
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50, nullable = false)
+    private LoginType loginType;
+
+    @Column(length = 50)
+    private String provider;
+
+    @Column(length = 100)
+    private String providerId;
 
     @Column
     private boolean isDeleted = false;
 
-    private User(String email, String username, String password) {
-
-        this.email = email;
-        this.username = username;
-        this.password = password;
+    public static User createLocal(String email, String username, String password) {
+        User user = new User();
+        user.email = email;
+        user.username = username;
+        user.password = password;
+        user.loginType = LoginType.LOCAL;
+        return user;
     }
 
-    public static User create(String email, String username, String password) {
-
-        return new User(email, username, password);
+    public static User createKakao(String email, String username, String providerId) {
+        User user = new User();
+        user.email = email;
+        user.username = username;
+        user.password = null;
+        user.loginType = LoginType.KAKAO;
+        user.provider = "kakao";
+        user.providerId = providerId;
+        return user;
     }
 }

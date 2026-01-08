@@ -30,23 +30,22 @@ public class AccommodationController {
             @ModelAttribute SearchAccommodationCond cond,
             @PageableDefault(page = 0, size = 10) Pageable pageable
     ) {
-        Slice<AccommodationResponse> result = accommodationSearchService.searchAccommodations(cond, pageable);
+        Slice<AccommodationResponse> response = accommodationSearchService.searchAccommodations(cond, pageable);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(GlobalResponse.success(true, "숙소 목록 검색 성공", result));
+                .body(GlobalResponse.success(true, "숙소 목록 검색 성공", response));
     }
 
     @GetMapping("/{accommodationId}")
     public ResponseEntity<GlobalResponse<GetAccommodationCacheResponse>> getAccommodation(@PathVariable Long accommodationId, HttpServletRequest request) {
 
-        GetAccommodationCacheResponse result = accommodationService.getAccommodation(accommodationId);
         String ipAddress = request.getRemoteAddr();
 
         GetAccommodationCacheResponse response = accommodationService.getAccommodation(accommodationId, ipAddress);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(GlobalResponse.success(true, "숙소 조회 성공", result));
+                .body(GlobalResponse.success(true, "숙소 조회 성공", response));
     }
 
     @GetMapping("/views/ranking")

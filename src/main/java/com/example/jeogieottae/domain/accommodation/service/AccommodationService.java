@@ -6,7 +6,6 @@ import com.example.jeogieottae.common.response.CustomPageResponse;
 import com.example.jeogieottae.domain.accommodation.dto.condition.SearchAccommodationCond;
 import com.example.jeogieottae.domain.accommodation.dto.response.AccommodationResponse;
 import com.example.jeogieottae.domain.accommodation.dto.response.GetAccommodationCacheResponse;
-import com.example.jeogieottae.domain.accommodation.dto.response.GetAccommodationResponse;
 import com.example.jeogieottae.domain.accommodation.entity.Accommodation;
 import com.example.jeogieottae.domain.accommodation.repository.AccommodationRepository;
 import lombok.RequiredArgsConstructor;

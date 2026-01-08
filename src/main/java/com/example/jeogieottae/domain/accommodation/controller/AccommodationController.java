@@ -5,7 +5,6 @@ import com.example.jeogieottae.common.response.GlobalResponse;
 import com.example.jeogieottae.domain.accommodation.dto.condition.SearchAccommodationCond;
 import com.example.jeogieottae.domain.accommodation.dto.response.AccommodationResponse;
 import com.example.jeogieottae.domain.accommodation.dto.response.GetAccommodationCacheResponse;
-import com.example.jeogieottae.domain.accommodation.dto.response.GetAccommodationResponse;
 import com.example.jeogieottae.domain.accommodation.service.AccommodationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +36,7 @@ public class AccommodationController {
 
     @GetMapping("/{accommodationId}")
     public ResponseEntity<GlobalResponse<GetAccommodationCacheResponse>> getAccommodation(@PathVariable Long accommodationId, HttpServletRequest request) {
+
         String ipAddress = request.getRemoteAddr();
 
         GetAccommodationCacheResponse response = accommodationService.getAccommodation(accommodationId, ipAddress);

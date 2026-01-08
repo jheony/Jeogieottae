@@ -63,7 +63,7 @@ spring:
     active: dev
 
   elasticsearch:
-    uris: http://localhost:9200
+    uris: ${ELASTIC_SEARCH}
     socket-timeout: 30s
     connection-timeout: 5s
 

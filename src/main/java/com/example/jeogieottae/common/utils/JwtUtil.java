@@ -40,7 +40,7 @@ public class JwtUtil {
     public String generateToken(String username, String userEmail, Long userId) {
 
         Date now = new Date();
-        return BEARER_PREFIX + Jwts.builder()
+        return Jwts.builder()
                 .subject(userId.toString())
                 .claim("username", username)
                 .claim("userEmail", userEmail)

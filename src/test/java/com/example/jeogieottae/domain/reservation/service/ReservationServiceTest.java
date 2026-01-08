@@ -44,7 +44,7 @@ class ReservationServiceTest {
     @BeforeEach
     void setUp() {
         reservationRepository.deleteAll();
-        User user = User.create("asdf@asdf.com", "테스트유저", "1234");
+        User user = User.createLocal("asdf@asdf.com", "테스트유저", "1234");
         Accommodation accommodation = new Accommodation("accommodation1", AccommodationType.HOTEL, City.CHEONAN);
         Room room = new Room("room", 100000L, accommodation, null);
 

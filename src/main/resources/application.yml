@@ -61,14 +61,11 @@ spring:
     base-url: https://api.tosspayments.com/v1/payments
     secret-key: ${PAYMENT_SECRET_KEY}
     token-key: ${PAYMENT_TOKEN_KEY}
-  profiles:
-    active: dev
 
   elasticsearch:
-    uris: http://localhost:9200
+    uris: ${ELASTIC_SEARCH}
     socket-timeout: 30s
     connection-timeout: 5s
 
 app:
   server-name: ${SERVER_NAME:unknown}
-

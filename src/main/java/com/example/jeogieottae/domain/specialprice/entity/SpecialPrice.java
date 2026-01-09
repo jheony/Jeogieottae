@@ -23,6 +23,6 @@ public class SpecialPrice {
     @Column(name = "discount", nullable = false)
     private Long discount;
 
-    @Column(name = "due_timestamp")
-    private LocalDateTime dueTimestamp;
+    @Column(name = "expires_at")
+    private LocalDateTime expiresAt;
 }

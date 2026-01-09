@@ -11,6 +11,7 @@ import com.example.jeogieottae.domain.accommodation.dto.response.AccommodationRe
 import com.example.jeogieottae.domain.accommodation.enums.AccommodationSortType;
 import com.example.jeogieottae.domain.accommodation.enums.City;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "app.features.search-enabled", havingValue = "true", matchIfMissing = true)
 public class AccommodationSearchService {
 
     private final ElasticsearchOperations elasticsearchOperations;

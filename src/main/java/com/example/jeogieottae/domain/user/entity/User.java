@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Entity
 @Table(name = "users")
@@ -25,6 +27,9 @@ public class User {
     @Column(length = 200)
     private String password;
 
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 50, nullable = false)
     private LoginType loginType;
@@ -43,6 +48,7 @@ public class User {
         user.email = email;
         user.username = username;
         user.password = password;
+        user.createdAt = LocalDateTime.now();
         user.loginType = LoginType.LOCAL;
         return user;
     }

@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - dev
+      - main
     types:
       - closed
   push:
@@ -67,6 +68,17 @@ jobs:
             echo "IMAGE=${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
             docker pull "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
 
+            # Ensure .env exists
+            touch .env
+
+            # Force-disable search + disable ES repositories (to allow boot without ES)
+            # Remove existing keys to avoid duplicates
+            sed -i '/^APP_FEATURES_SEARCH_ENABLED=/d' .env
+            sed -i '/^SPRING_DATA_ELASTICSEARCH_REPOSITORIES_ENABLED=/d' .env
+
+            echo "APP_FEATURES_SEARCH_ENABLED=false" >> .env
+            echo "SPRING_DATA_ELASTICSEARCH_REPOSITORIES_ENABLED=false" >> .env
+
             docker stop jeogieottae || true
             docker rm jeogieottae || true
 
@@ -86,6 +98,7 @@ jobs:
             done
 
             echo "SERVER 1 health check failed"
+            docker logs --tail 200 jeogieottae || true
             exit 1
 
       # DEPLOY SERVER 2 + HEALTH CHECK (on EC2)
@@ -100,6 +113,15 @@ jobs:
 
             echo "IMAGE=${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
             docker pull "${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+
+            # Ensure .env exists
+            touch .env
+
+            sed -i '/^APP_FEATURES_SEARCH_ENABLED=/d' .env
+            sed -i '/^SPRING_DATA_ELASTICSEARCH_REPOSITORIES_ENABLED=/d' .env
+
+            echo "APP_FEATURES_SEARCH_ENABLED=false" >> .env
+            echo "SPRING_DATA_ELASTICSEARCH_REPOSITORIES_ENABLED=false" >> .env
 
             docker stop jeogieottae || true
             docker rm jeogieottae || true
@@ -120,4 +142,5 @@ jobs:
             done
 
             echo "SERVER 2 health check failed"
+            docker logs --tail 200 jeogieottae || true
             exit 1

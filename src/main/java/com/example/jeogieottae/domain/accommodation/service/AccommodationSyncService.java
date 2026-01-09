@@ -15,6 +15,7 @@ import com.example.jeogieottae.domain.room.repository.RoomRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "app.features.search-enabled", havingValue = "true", matchIfMissing = true)
 public class AccommodationSyncService {
 
     private final AccommodationRepository accommodationRepository;

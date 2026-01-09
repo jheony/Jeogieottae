@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaAuditing
 @SpringBootApplication
 public class JeogieottaeApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(JeogieottaeApplication.class, args);
     }
